@@ -6,7 +6,6 @@ venv/*
 .env
 
 
-
 # react
 node_modules/
 dist/
