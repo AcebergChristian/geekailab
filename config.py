@@ -12,7 +12,7 @@ LOGGING_CONFIG = {
 
 # LLM配置
 LLM_CONFIG = {
-    'api_key': "sk-xxx",
+    'api_key': "Dl8E3y6qNMbSfkINULISmqUir32DXRPZT719uNQ75jQbXBV8RWPRJQQJ99BKACYeBjFXJ3w3AAABACOGGxCH",
     'azure_endpoint': "https://prime-02.openai.azure.com/",
     'api_version': "2025-04-01-preview",
     'model': "gpt-4.1"

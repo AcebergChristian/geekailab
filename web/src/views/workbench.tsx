@@ -1,17 +1,20 @@
+import '@wangeditor/editor/dist/css/style.css' // 引入 css
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   ReferenceLine, Cell
 } from 'recharts';
 import { 
-  ChevronLeft, ChevronDown, Search, Filter, Download, Settings, 
-  MoreHorizontal, RefreshCw, User, Bell, Menu, Grid, PieChart,
-  FileText, CheckCircle2, BarChart2, LayoutDashboard, Moon, Sun,
-  Mail, Eye, Send, Archive, Trash2, ExternalLink, FileJson, ArrowRightLeft
+  ChevronLeft, Download, MoreHorizontal, RefreshCw, FileText, ExternalLink, FileJson, ArrowRightLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useThemeContext } from '@/contexts/themeContext';
 import { useI18nContext } from '@/contexts/i18nContext';
+
+import { Editor, Toolbar } from '@wangeditor/editor-for-react'
+import { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor'
+
 
 // 邮件数据类型
 interface EmailItem {
@@ -125,6 +128,9 @@ const Workbench: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(5); // 每页显示5条
+  // 添加富文本相关的状态
+  const [richTextContent, setRichTextContent] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   
 
   // 使用上下文
@@ -353,6 +359,42 @@ const Workbench: React.FC = () => {
     }
   };
 
+
+  // 处理富文本提交
+  const handleRichTextSubmit = async () => {
+    if (!richTextContent.trim()) {
+      alert(t('pleaseEnterRichText'));
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch('/api/parse-rich-text', { // 假设API端点是这个
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: richTextContent
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      setJsonResult(result);
+    } catch (error) {
+      console.error('提交富文本失败:', error);
+      // 显示错误信息
+      alert(t('submitRichTextFailed'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // 导出JSON数据
   const exportJson = () => {
     if (!jsonResult) return;
@@ -368,6 +410,42 @@ const Workbench: React.FC = () => {
     linkElement.click();
   };
 
+
+  // 富文本相关
+  // editor 实例
+  const [editor, setEditor] = useState<IDomEditor | null>(null) // TS 语法
+  // const [editor, setEditor] = useState(null)                   // JS 语法
+
+  // 编辑器内容
+  const [html, setHtml] = useState('')
+
+  // 模拟 ajax 请求，异步设置 html
+  useEffect(() => {
+    setTimeout(() => {
+      setHtml('')
+    }, 1500)
+  }, [])
+
+  // 工具栏配置
+  const toolbarConfig: Partial<IToolbarConfig> = {} // TS 语法
+  // const toolbarConfig = { }                        // JS 语法
+
+  // 编辑器配置
+  const editorConfig: Partial<IEditorConfig> = {
+    // TS 语法
+    // const editorConfig = {                         // JS 语法
+    placeholder: '请输入内容...',
+  }
+
+  // 及时销毁 editor ，重要！
+  useEffect(() => {
+    return () => {
+      if (editor == null) return
+      editor.destroy()
+      setEditor(null)
+    }
+  }, [editor])
+
   return (
     <div className={isDark ? "p-6 bg-gray-900 text-gray-100" : "p-6 bg-gray-50 text-gray-900"}>
       <div className="mb-6">
@@ -378,22 +456,41 @@ const Workbench: React.FC = () => {
 
       {/* 主工作区 */}
       <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-200px)]">
-        {/* 左侧邮件列表 */}
+        {/* 左侧邮件列表/富文本输入 */}
         {showMailList && (
-          <div className={cn("lg:w-1/4 flex-shrink-0 rounded-lg border shadow-sm overflow-hidden",
+          <div className={cn("lg:w-1/4 flex-shrink-0 rounded-lg border shadow-sm overflow-hidden flex flex-col",
             isDark 
               ? "bg-gray-800 border-gray-700" 
               : "bg-white border-gray-200"
           )}>
-            <div className={cn("p-4 border-b",
+            {/* 标签页头部 */}
+            <div className={cn("p-4 border-b flex",
               isDark 
                 ? "border-gray-700 bg-gray-750" 
                 : "border-gray-200 bg-gray-50"
             )}>
-              <div className="flex justify-between items-center">
-                <h3 className="font-medium">{t('inbox')}</h3>
-                <div className="flex space-x-2">
+              <div className="flex space-x-4">
+                <button
+                  className={`pb-2 px-1 ${activeTab === 'inbox' ? (isDark ? 'text-blue-400 border-b-2 border-blue-400' : 'text-blue-600 border-b-2 border-blue-600') : (isDark ? 'text-gray-400' : 'text-gray-600')}`}
+                  onClick={() => setActiveTab('inbox')}
+                >
+                  {t('inbox')}
+                </button>
+                <button
+                  className={`pb-2 px-1 ${activeTab === 'richText' ? (isDark ? 'text-blue-400 border-b-2 border-blue-400' : 'text-blue-600 border-b-2 border-blue-600') : (isDark ? 'text-gray-400' : 'text-gray-600')}`}
+                  onClick={() => {
+                    setActiveTab('richText')
+                    setShowMailList(false)
                     
+                  }}
+                >
+                  {t('richTextField')}
+                </button>
+              </div>
+              <div className="ml-auto flex space-x-2">
+                {/* 根据当前标签页显示不同按钮 */}
+                {activeTab === 'inbox' && (
+                  <>
                     {/* 加载状态指示器 */}
                     {isLoading && (
                       <div className={cn("flex justify-center items-center py-1",
@@ -403,75 +500,95 @@ const Workbench: React.FC = () => {
                         {t('loadingEmails')}
                       </div>
                     )}
-
-                  <button 
-                    onClick={() => fetchEmails()}
-                    className={cn("p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700", 
-                      isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700")}
-                    title={t('refresh')}
-                  >
-                    <RefreshCw size={16} />
-                  </button>
-                  <button 
-                    onClick={() => setShowMailList(false)}
-                    className={cn("p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700", 
-                      isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700")}
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-                </div>
+                    <button 
+                      onClick={() => fetchEmails()}
+                      className={cn("p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700", 
+                        isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700")}
+                      title={t('refresh')}
+                    >
+                      <RefreshCw size={16} />
+                    </button>
+                  </>
+                )}
+                <button 
+                  onClick={() => setShowMailList(false)}
+                  className={cn("p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700", 
+                    isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700")}
+                >
+                  <ChevronLeft size={16} />
+                </button>
               </div>
             </div>
-            <div className="overflow-y-auto h-[calc(100%-100px)]">
-              {emails.map(email => (
-                <EmailListItem 
-                  key={email.id}
-                  email={email}
-                  isSelected={selectedEmail?.id === email.id}
-                  onClick={() => setSelectedEmailId(email.id)}
-                />
-              ))}
-            </div>
-
-            {/* 分页按钮栏 */}
-            <div className={cn("mb-0 p-3 border-t flex items-center justify-between",
-              isDark 
-                ? "border-gray-700 bg-gray-750" 
-                : "border-gray-200 bg-gray-50"
-            )}>
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className={cn("px-3 py-1 rounded text-sm",
-                  currentPage === 1 
-                    ? (isDark ? "text-gray-600" : "text-gray-400") 
-                    : (isDark 
-                      ? "text-gray-300 hover:bg-gray-700" 
-                      : "text-gray-700 hover:bg-gray-200")
-                )}
-              >
-                {t('previous')}
-              </button>
-              
-              <span className={cn("text-sm", isDark ? "text-gray-300" : "text-gray-700")}>
-                {t('page')} {currentPage} {t('of')} {totalPages}
-              </span>
-              
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className={cn("px-3 py-1 rounded text-sm",
-                  currentPage === totalPages 
-                    ? (isDark ? "text-gray-600" : "text-gray-400") 
-                    : (isDark 
-                      ? "text-gray-300 hover:bg-gray-700" 
-                      : "text-gray-700 hover:bg-gray-200")
-                )}
-              >
-                {t('next')}
-              </button>
-            </div>
             
+            {/* 标签页内容 */}
+            <div className="flex-1 overflow-y-auto">
+              {activeTab === 'inbox' ? (
+                <>
+                  <div className="h-[calc(100%-100px)] overflow-y-auto">
+                    {emails.map(email => (
+                      <EmailListItem 
+                        key={email.id}
+                        email={email}
+                        isSelected={selectedEmail?.id === email.id}
+                        onClick={() => setSelectedEmailId(email.id)}
+                      />
+                    ))}
+                  </div>
+                  
+                  {/* 分页按钮栏 */}
+                  <div className={cn("p-3 border-t flex items-center justify-between",
+                    isDark 
+                      ? "border-gray-700 bg-gray-750" 
+                      : "border-gray-200 bg-gray-50"
+                  )}>
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className={cn("px-3 py-1 rounded text-sm",
+                        currentPage === 1 
+                          ? (isDark ? "text-gray-600" : "text-gray-400") 
+                          : (isDark 
+                            ? "text-gray-300 hover:bg-gray-700" 
+                            : "text-gray-700 hover:bg-gray-200")
+                      )}
+                    >
+                      {t('previous')}
+                    </button>
+                    
+                    <span className={cn("text-sm", isDark ? "text-gray-300" : "text-gray-700")}>
+                      {t('page')} {currentPage} {t('of')} {totalPages}
+                    </span>
+                    
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className={cn("px-3 py-1 rounded text-sm",
+                        currentPage === totalPages 
+                          ? (isDark ? "text-gray-600" : "text-gray-400") 
+                          : (isDark 
+                            ? "text-gray-300 hover:bg-gray-700" 
+                            : "text-gray-700 hover:bg-gray-200")
+                      )}
+                    >
+                      {t('next')}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                // 富文本输入区域
+                <div className="p-4 h-full flex flex-col">
+                  <Editor
+          defaultConfig={editorConfig}
+          value={html}
+          onCreated={setEditor}
+          onChange={(editor) => setHtml(editor.getHtml())}
+          mode="default"
+          style={{ height: '500px', overflowY: 'hidden' }}
+        />
+                  
+                </div>
+              )}
+            </div>
           </div>
         )}
 

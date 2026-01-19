@@ -79,7 +79,15 @@ const translations: Translations = {
     routeOptimization: 'Route Optimization',
     costAnalysis: 'Cost Analysis',
     logisticsTracking: 'Logistics Tracking',
-    supplyChainOptimization: 'Supply Chain Optimization'
+    supplyChainOptimization: 'Supply Chain Optimization',
+    // 新增富文本相关词条
+    richTextField: 'Rich Text',
+    inputRichText: 'Input Rich Text',
+    enterRichTextPlaceholder: 'Enter your rich text here...',
+    submitting: 'Submitting',
+    submit: 'Submit',
+    pleaseEnterRichText: 'Please enter rich text content',
+    submitRichTextFailed: 'Failed to submit rich text'
   },
   zh: {
     evaluation: '评测',
@@ -148,7 +156,15 @@ const translations: Translations = {
     routeOptimization: '路径优化',
     costAnalysis: '成本分析',
     logisticsTracking: '物流跟踪',
-    supplyChainOptimization: '供应链优化'
+    supplyChainOptimization: '供应链优化',
+    // 新增富文本相关词条
+    richTextField: '富文本',
+    inputRichText: '输入富文本',
+    enterRichTextPlaceholder: '在此输入您的富文本内容...',
+    submitting: '提交中',
+    submit: '提交',
+    pleaseEnterRichText: '请输入富文本内容',
+    submitRichTextFailed: '提交富文本失败'
   }
 };
 
