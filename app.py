@@ -4,6 +4,9 @@
 邮件和附件查询API接口
 """
 
+from openai import AzureOpenAI
+from config import LLM_CONFIG
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -11,6 +14,10 @@ from fastapi.responses import HTMLResponse, FileResponse
 # import sqlite3
 from typing import List, Optional
 import os
+import time
+
+
+from utils.html_parser import HtmlTableParser
 
 
 import pysqlite3
@@ -515,6 +522,166 @@ async def parse_email_content_api(request: dict):
         return {
             "result": result,
             "processing_time": processing_time,
+            "success": True
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"解析过程中发生错误: {str(e)}")
+
+
+
+
+
+
+
+
+
+
+def saijia_parse_with_llm(clean_html: str) -> dict:
+    """
+    使用大模型解析HTML内容
+    """
+    import openai
+    import json
+    
+    # 构建提示词
+    prompt = f"""
+角色定义
+你是一个专业的国际物流邮件解析模型，擅长从复杂英文邮件正文与富文本表格中提取结构化字段。
+解析目标
+请从以下邮件正文中
+{clean_html}
+提取指定字段，输出为 JSON。所有字段均必须来自邮件正文或表格，不要编造、不要推断。
+需要提取的字段
+{{
+  "POL": "",
+  "POD": "",
+  "transport_mode": "",
+  "orders": [
+    {{
+      "order_no": "",
+      "delivery_note": "",
+      "store_code_or_whs_code": "",
+      "brand": "",
+      "country": ""
+    }}
+  ]
+}}
+字段规则（非常重要）
+POL / POD
+从正文中Booking后面的信息提取 POL、POD 
+提取到什么就输出什么
+transport_mode
+只允许以下枚举值之一：
+SEA FCL
+SEA LCL
+AIR
+若正文或表格中出现 SEA FCL、SEA-FCL、SEA FCL 8*40HQ，统一输出 SEA FCL
+orders（多行表格数据）
+表格中 每一行有效订单 = orders 中的一个对象
+必须逐行提取，不可合并、不遗漏
+order_no
+来自表格中的 ORDER NO. / ORDER Nº / ORDER NUMBER
+delivery_note
+来自表格中的 DELIVERY NOTE 列
+原样提取文本（如 requesting items by 28th Jan）
+store_code_or_whs_code
+优先提取 STORE CODE 或 WHS CODE
+若字段合并显示（如 STORE CODE/WHS CODE），直接提取该列值
+brand
+来自表格中的 BRAND
+country
+来自表格中的 COUNTRY
+输出要求
+仅输出 JSON
+不要解释、不加说明、不输出原文
+若某字段在单行中缺失，填空字符串 ""
+表格有多少行，就生成多少条 orders
+"""
+
+    try:
+        # 调用大模型API
+        client = AzureOpenAI(
+        api_key=LLM_CONFIG['api_key'],
+        azure_endpoint=LLM_CONFIG['azure_endpoint'],
+        api_version=LLM_CONFIG['api_version']
+    )
+    
+        response = client.chat.completions.create(
+            model=LLM_CONFIG['model'],
+            messages=[
+                {"role": "user", "content": prompt},
+            ],
+            response_format={"type": "json_object"},
+            temperature=0,
+            timeout=60
+        )
+        
+        res = json.loads(response.choices[0].message.content)
+        return res if res else ""
+
+
+    except Exception as e:
+        print(f"LLM解析出错: {str(e)}")
+        # 出错时返回默认结构
+        return {
+            "POL": "",
+            "POD": "",
+            "transport_mode": "",
+            "orders": []
+        }
+
+# 清理html
+def clean_html_content(html_content: str) -> str:
+    """
+    清理HTML内容，去除样式属性等，只保留基本标签结构
+    """
+    from bs4 import BeautifulSoup
+    
+    # 解析HTML
+    soup = BeautifulSoup(html_content, 'html.parser')
+    
+    # 移除所有style属性
+    for tag in soup.find_all():
+        if tag.attrs:
+            # 移除style属性
+            if 'style' in tag.attrs:
+                del tag['style']
+            # 移除其他非必要的属性，保留基本标签结构
+            attrs_to_keep = []
+            for attr in tag.attrs:
+                # 只保留一些基本属性如href, src等
+                if attr.lower() in ['href', 'src', 'alt', 'title', 'target', 'rel', 'id', 'class']:
+                    attrs_to_keep.append(attr)
+            
+            # 删除不需要的属性
+            for attr in list(tag.attrs.keys()):
+                if attr not in attrs_to_keep:
+                    del tag[attr]
+    
+    return str(soup)
+
+######### 解析saijia邮件正文接口content #########
+@app.post("/api/parse-saijia-content")
+async def parse_rich_content_api(request: dict):
+    """
+    解析富文本内容
+    """
+    try:
+        time1 = time.time()
+        html_content = request.get("html_content", "")
+        if not html_content:
+            raise HTTPException(status_code=400, detail="html_content is required")
+        
+        # 1. clean html
+        cleanhtmlcontent = clean_html_content(html_content)
+
+        # 2. 使用大模型进行解析
+        result = saijia_parse_with_llm(cleanhtmlcontent)
+        
+        return {
+            "result": result,
+            "processing_time": time.time() - time1,
             "success": True
         }
         

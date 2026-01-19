@@ -1,19 +1,23 @@
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
-
-import React, { useState, useMemo, useEffect } from 'react';
+ 
+import { useState, useMemo, useEffect } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   ReferenceLine, Cell
 } from 'recharts';
 import { 
-  ChevronLeft, Download, MoreHorizontal, RefreshCw, FileText, ExternalLink, FileJson, ArrowRightLeft
+  ChevronLeft, Download, MoreHorizontal, RefreshCw, FileText, ExternalLink, FileJson, ArrowRightLeft,
+  RotateCcw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useThemeContext } from '@/contexts/themeContext';
 import { useI18nContext } from '@/contexts/i18nContext';
 
+
+
 import { Editor, Toolbar } from '@wangeditor/editor-for-react'
 import { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor'
+
 
 
 // 邮件数据类型
@@ -120,7 +124,6 @@ const Workbench: React.FC = () => {
   // 状态管理
   const [activeTab, setActiveTab] = useState<string>('inbox');
   const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
-  const [showMailList, setShowMailList] = useState<boolean>(true);
   const [jsonResult, setJsonResult] = useState<any>(null);
   const [isParsing, setIsParsing] = useState<boolean>(false);
   const [emails, setEmails] = useState<EmailItem[]>([]);
@@ -128,20 +131,17 @@ const Workbench: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(5); // 每页显示5条
-  // 添加富文本相关的状态
-  const [richTextContent, setRichTextContent] = useState<string>('');
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  // 富文本
+  const [richvalue, setRichValue] = useState('');
   
+
+  // 添加解析结果视图tab状态
+  const [resultViewTab, setResultViewTab] = useState<'json' | 'table'>('json');
 
   // 使用上下文
   const { theme, toggleTheme, isDark } = useThemeContext();
   const { language, toggleLanguage, t } = useI18nContext();
 
-  // 计算当前页面的邮件
-  const currentEmails = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    return emails.slice(startIndex, startIndex + pageSize);
-  }, [emails, currentPage, pageSize]);
   
   // 获取邮件数据 - 尝试从API获取，失败则使用模拟数据
   const fetchEmails = async (page: number = 1, size: number = 5) => {
@@ -281,7 +281,6 @@ const Workbench: React.FC = () => {
   ];
 
 
-
   // 切换页面
   const handlePageChange = (page: number) => {
     console.log('切换到第', page, '页')
@@ -303,97 +302,124 @@ const Workbench: React.FC = () => {
   }, [selectedEmailId, emails]);
 
   // 解析邮件内容
-  const parseEmailContent = async () => {
-    if (!selectedEmail) return;
-    
-    setIsParsing(true);
-    
-    try {
-      const response = await fetch('/api/parse-email-content', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          html_content: selectedEmail.html_content || selectedEmail.content
-        })
-      });
+  const parseContent = async () => {
+    if (activeTab === 'inbox') {
+      if (!selectedEmail) return;
       
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      setIsParsing(true);
+      
+      try {
+        const response = await fetch('/api/parse-email-content', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            html_content: selectedEmail.html_content || selectedEmail.content
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        setJsonResult(result);
+      } catch (error) {
+        console.error('解析邮件内容失败:', error);
+        // 如果API调用失败，仍然使用模拟数据作为后备
+        const mockJsonResult = {
+          email_id: selectedEmail.id,
+          sender: selectedEmail.sender,
+          subject: selectedEmail.subject,
+          date: selectedEmail.date,
+          content_summary: selectedEmail.content.substring(0, 100) + '...',
+          entities: {
+            people: ['张三', '李四', '王五'],
+            organizations: ['公司A', '供应商B', '客户C'],
+            dates: ['2025-01-10', '2025-01-15'],
+            amounts: ['100,000元', '50,000元'],
+            locations: ['北京', '上海']
+          },
+          sentiment: 'neutral',
+          action_items: ['准备Q4报告', '参加周五会议', '跟进订单状态'],
+          attachments_parsed: selectedEmail.attachments.map(att => ({
+            name: att.filename,
+            type: att.filename.split('.').pop(),
+            size: '1.2MB',
+            parsed_content: '已解析的附件内容摘要...'
+          })),
+          processing_time: 0,
+          success: false
+        };
+        
+        setJsonResult(mockJsonResult);
+      } finally {
+        setIsParsing(false);
+      }
+    } else {
+      // 富文本标签页时的处理
+      if (!richvalue.trim()) {
+        alert(t('pleaseEnterRichText'));
+        return;
       }
       
-      const result = await response.json();
-      setJsonResult(result);
-    } catch (error) {
-      console.error('解析邮件内容失败:', error);
-      // 如果API调用失败，仍然使用模拟数据作为后备
-      const mockJsonResult = {
-        email_id: selectedEmail.id,
-        sender: selectedEmail.sender,
-        subject: selectedEmail.subject,
-        date: selectedEmail.date,
-        content_summary: selectedEmail.content.substring(0, 100) + '...',
-        entities: {
-          people: ['张三', '李四', '王五'],
-          organizations: ['公司A', '供应商B', '客户C'],
-          dates: ['2025-01-10', '2025-01-15'],
-          amounts: ['100,000元', '50,000元'],
-          locations: ['北京', '上海']
-        },
-        sentiment: 'neutral',
-        action_items: ['准备Q4报告', '参加周五会议', '跟进订单状态'],
-        attachments_parsed: selectedEmail.attachments.map(att => ({
-          name: att.filename,
-          type: att.filename.split('.').pop(),
-          size: '1.2MB',
-          parsed_content: '已解析的附件内容摘要...'
-        })),
-        processing_time: 0,
-        success: false
-      };
+      setIsParsing(true);
       
-      setJsonResult(mockJsonResult);
-    } finally {
-      setIsParsing(false);
+      try {
+        const response = await fetch('/api/parse-email-content', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            html_content: richvalue
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        setJsonResult(result);
+      } catch (error) {
+        console.error('解析富文本内容失败:', error);
+        // 使用模拟数据作为后备
+        const mockJsonResult = {
+          content_type: 'rich_text',
+          content_summary: richvalue.substring(0, 100) + '...',
+          entities: {
+            people: ['张三', '李四', '王五'],
+            organizations: ['公司A', '供应商B', '客户C'],
+            dates: ['2025-01-10', '2025-01-15'],
+            amounts: ['100,000元', '50,000元'],
+            locations: ['北京', '上海']
+          },
+          sentiment: 'neutral',
+          action_items: ['准备Q4报告', '参加周五会议', '跟进订单状态'],
+          processing_time: 0,
+          success: false
+        };
+        
+        setJsonResult(mockJsonResult);
+      } finally {
+        setIsParsing(false);
+      }
     }
+  };
+  
+
+  // 重置功能
+  const resetResults = () => {
+    setJsonResult(null);
+    setResultViewTab('json');
   };
 
 
-  // 处理富文本提交
-  const handleRichTextSubmit = async () => {
-    if (!richTextContent.trim()) {
-      alert(t('pleaseEnterRichText'));
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    try {
-      const response = await fetch('/api/parse-rich-text', { // 假设API端点是这个
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content: richTextContent
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const result = await response.json();
-      setJsonResult(result);
-    } catch (error) {
-      console.error('提交富文本失败:', error);
-      // 显示错误信息
-      alert(t('submitRichTextFailed'));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+
+
+  
 
   // 导出JSON数据
   const exportJson = () => {
@@ -410,31 +436,81 @@ const Workbench: React.FC = () => {
     linkElement.click();
   };
 
+  // 导出Excel数据
+  const exportExcel = () => {
+    if (!jsonResult) return;
+    
+    let csvContent = '';
+    
+    if (jsonResult?.result?.prices && jsonResult.result.prices.length > 0) {
+      // 如果存在prices数组，导出表格数据
+      const headers = Object.keys(jsonResult.result.prices[0]);
+      csvContent = headers.join(',') + '\n';
+      
+      jsonResult.result.prices.forEach((priceObj: any) => {
+        const values = headers.map(header => {
+          const value = priceObj[header];
+          // 处理包含逗号或引号的值
+          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+            return `"${value.replace(/"/g, '""')}"`;
+          }
+          return value;
+        });
+        csvContent += values.join(',') + '\n';
+      });
+    } else {
+      // 否则导出jsonResult的基本结构
+      const headers = Object.keys(jsonResult);
+      csvContent = headers.join(',') + '\n';
+      
+      const values = headers.map(header => {
+        const value = jsonResult[header];
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+          return `"${value.replace(/"/g, '""')}"`;
+        }
+        return value;
+      });
+      csvContent += values.join(',') + '\n';
+    }
+    
+    const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
+    const exportFileDefaultName = `parsed_data_${selectedEmail?.id || 'unknown'}.csv`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+  };
+
+  // 根据当前视图选择导出方法
+  const handleExport = () => {
+    if (resultViewTab === 'json') {
+      exportJson();
+    } else {
+      exportExcel();
+    }
+  };
+
+
+
 
   // 富文本相关
-  // editor 实例
   const [editor, setEditor] = useState<IDomEditor | null>(null) // TS 语法
-  // const [editor, setEditor] = useState(null)                   // JS 语法
-
-  // 编辑器内容
-  const [html, setHtml] = useState('')
 
   // 模拟 ajax 请求，异步设置 html
   useEffect(() => {
     setTimeout(() => {
-      setHtml('')
+      setRichValue('')
     }, 1500)
   }, [])
 
   // 工具栏配置
-  const toolbarConfig: Partial<IToolbarConfig> = {} // TS 语法
-  // const toolbarConfig = { }                        // JS 语法
+  const toolbarConfig: Partial<IToolbarConfig> = {
+
+  }
 
   // 编辑器配置
   const editorConfig: Partial<IEditorConfig> = {
-    // TS 语法
-    // const editorConfig = {                         // JS 语法
-    placeholder: '请输入内容...',
   }
 
   // 及时销毁 editor ，重要！
@@ -446,85 +522,127 @@ const Workbench: React.FC = () => {
     }
   }, [editor])
 
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
   return (
-    <div className={isDark ? "p-6 bg-gray-900 text-gray-100" : "p-6 bg-gray-50 text-gray-900"}>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">{t('workbench')}</h1>
-        <p className={isDark ? "text-gray-400" : "text-gray-600"}>{t('emailProcessingWorkbench')}</p>
-      </div>
+    <div className={isDark ? "p-6 bg-gray-900 text-gray-100 min-h-screen" : "p-6 bg-gray-50 text-gray-900 min-h-screen"}>
+      <div className="max-w-8xl mx-auto">
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl font-bold">{t('GeekAILab')}</h1>
+          <p className={isDark ? "text-gray-400" : "text-gray-600"}>{t('AnylysisWorkbench')}</p>
+        </div>
 
+        {/* 顶部Tab导航 */}
+        <div className="flex justify-center mb-6">
+          <div className={cn("inline-flex rounded-md shadow-sm",
+            isDark 
+              ? "bg-gray-800" 
+              : "bg-white"
+          )}>
+            <button
+              type="button"
+              className={`px-4 py-2 text-sm font-medium rounded-l-lg ${
+                activeTab === 'inbox'
+                  ? (isDark 
+                      ? 'bg-blue-600 text-white border border-blue-600' 
+                      : 'bg-blue-100 text-blue-700 border border-blue-300')
+                  : (isDark 
+                      ? 'text-gray-300 hover:bg-gray-700' 
+                      : 'text-gray-700 hover:bg-gray-100')
+              }`}
+              onClick={() => setActiveTab('inbox')}
+            >
+              {t('inbox')}
+            </button>
+            <button
+              type="button"
+              className={`px-4 py-2 text-sm font-medium rounded-r-lg ${
+                activeTab === 'richText'
+                  ? (isDark 
+                      ? 'bg-blue-600 text-white border border-blue-600' 
+                      : 'bg-blue-100 text-blue-700 border border-blue-300')
+                  : (isDark 
+                      ? 'text-gray-300 hover:bg-gray-700' 
+                      : 'text-gray-700 hover:bg-gray-100')
+              }`}
+              onClick={() => setActiveTab('richText')}
+            >
+              {t('richTextField')}
+            </button>
+          </div>
+        </div>
 
-      {/* 主工作区 */}
-      <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-200px)]">
-        {/* 左侧邮件列表/富文本输入 */}
-        {showMailList && (
-          <div className={cn("lg:w-1/4 flex-shrink-0 rounded-lg border shadow-sm overflow-hidden flex flex-col",
+        {/* 控制按钮区 */}
+        <div className="flex justify-center mb-6 space-x-3">
+          <button 
+            onClick={parseContent}
+            disabled={isParsing}
+            className={cn("px-4 py-2 text-sm rounded-md flex items-center",
+              isDark 
+                ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                : "bg-blue-500 hover:bg-blue-600 text-white"
+            )}
+          >
+            {isParsing ? (
+              <>
+                <RefreshCw className="animate-spin mr-2" size={14} />
+                {t('parsing')}
+              </>
+            ) : (
+              <>
+                <ArrowRightLeft size={14} className="mr-2" />
+                {t('parse')}
+              </>
+            )}
+          </button>
+          
+          <button 
+            onClick={resetResults}
+            className={cn("px-4 py-2 text-sm rounded-md flex items-center",
+              isDark 
+                ? "bg-gray-600 hover:bg-gray-700 text-white" 
+                : "bg-gray-300 hover:bg-gray-400 text-gray-800"
+            )}
+          >
+            <RotateCcw size={14} className="mr-2" />
+            {t('reset')}
+          </button>
+        </div>
+
+        {/* 主工作区 */}
+        <div className={`grid grid-cols-1 ${activeTab === 'inbox' ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-4 h-[calc(100vh-280px)]`}>
+          {/* 左侧区域 */}
+          <div className={cn("rounded-lg border shadow-sm overflow-hidden flex flex-col",
             isDark 
               ? "bg-gray-800 border-gray-700" 
               : "bg-white border-gray-200"
           )}>
-            {/* 标签页头部 */}
-            <div className={cn("p-4 border-b flex",
-              isDark 
-                ? "border-gray-700 bg-gray-750" 
-                : "border-gray-200 bg-gray-50"
-            )}>
-              <div className="flex space-x-4">
-                <button
-                  className={`pb-2 px-1 ${activeTab === 'inbox' ? (isDark ? 'text-blue-400 border-b-2 border-blue-400' : 'text-blue-600 border-b-2 border-blue-600') : (isDark ? 'text-gray-400' : 'text-gray-600')}`}
-                  onClick={() => setActiveTab('inbox')}
-                >
-                  {t('inbox')}
-                </button>
-                <button
-                  className={`pb-2 px-1 ${activeTab === 'richText' ? (isDark ? 'text-blue-400 border-b-2 border-blue-400' : 'text-blue-600 border-b-2 border-blue-600') : (isDark ? 'text-gray-400' : 'text-gray-600')}`}
-                  onClick={() => {
-                    setActiveTab('richText')
-                    setShowMailList(false)
-                    
-                  }}
-                >
-                  {t('richTextField')}
-                </button>
-              </div>
-              <div className="ml-auto flex space-x-2">
-                {/* 根据当前标签页显示不同按钮 */}
-                {activeTab === 'inbox' && (
-                  <>
-                    {/* 加载状态指示器 */}
-                    {isLoading && (
-                      <div className={cn("flex justify-center items-center py-1",
-                        isDark ? "text-gray-400" : "text-gray-600"
-                      )}>
-                        <RefreshCw className="animate-spin mr-2" size={20} />
-                        {t('loadingEmails')}
-                      </div>
-                    )}
-                    <button 
-                      onClick={() => fetchEmails()}
-                      className={cn("p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700", 
-                        isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700")}
-                      title={t('refresh')}
-                    >
-                      <RefreshCw size={16} />
-                    </button>
-                  </>
-                )}
-                <button 
-                  onClick={() => setShowMailList(false)}
-                  className={cn("p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700", 
-                    isDark ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-700")}
-                >
-                  <ChevronLeft size={16} />
-                </button>
-              </div>
-            </div>
-            
-            {/* 标签页内容 */}
-            <div className="flex-1 overflow-y-auto">
-              {activeTab === 'inbox' ? (
-                <>
-                  <div className="h-[calc(100%-100px)] overflow-y-auto">
+            {activeTab === 'inbox' ? (
+              <>
+                {/* 邮件列表标题 */}
+                <div className={cn("p-4 border-b",
+                  isDark 
+                    ? "border-gray-700 bg-gray-750" 
+                    : "border-gray-200 bg-gray-50"
+                )}>
+                  <h3 className="font-medium">{t('emailList')}</h3>
+                </div>
+                
+                {/* 邮件列表 */}
+                <div className="flex flex-col flex-1 h-full overflow-y-auto">
+                  <div className="h-[100%] overflow-y-auto">
                     {emails.map(email => (
                       <EmailListItem 
                         key={email.id}
@@ -536,7 +654,7 @@ const Workbench: React.FC = () => {
                   </div>
                   
                   {/* 分页按钮栏 */}
-                  <div className={cn("p-3 border-t flex items-center justify-between",
+                  <div className={cn("p-2 border-t flex items-center justify-between mb-0",
                     isDark 
                       ? "border-gray-700 bg-gray-750" 
                       : "border-gray-200 bg-gray-50"
@@ -573,202 +691,275 @@ const Workbench: React.FC = () => {
                       {t('next')}
                     </button>
                   </div>
-                </>
-              ) : (
-                // 富文本输入区域
-                <div className="p-4 h-full flex flex-col">
-                  <Editor
-          defaultConfig={editorConfig}
-          value={html}
-          onCreated={setEditor}
-          onChange={(editor) => setHtml(editor.getHtml())}
-          mode="default"
-          style={{ height: '500px', overflowY: 'hidden' }}
-        />
-                  
+
+
+
+
                 </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* 邮件列表隐藏时的按钮 */}
-        {!showMailList && (
-          <button
-            onClick={() => setShowMailList(true)}
-            className={cn("p-4 mb-4 lg:mb-0 rounded-lg border shadow-sm flex items-center justify-center",
-              isDark 
-                ? "bg-gray-800 border-gray-700 text-gray-300 hover:bg-gray-750" 
-                : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
-            )}
-          >
-            <span>{t('showEmailList')}</span>
-          </button>
-        )}
-
-        {/* 中间邮件预览区 */}
-        <div className={cn("lg:w-2/4 flex-shrink-0 rounded-lg border shadow-sm overflow-hidden flex flex-col",
-          isDark 
-            ? "bg-gray-800 border-gray-700" 
-            : "bg-white border-gray-200"
-        )}>
-          <div className={cn("p-4 border-b flex justify-between items-center",
-            isDark 
-              ? "border-gray-700 bg-gray-750" 
-              : "border-gray-200 bg-gray-50"
-          )}>
-            <h3 className="font-medium">{t('emailPreview')}</h3>
-            <div className="flex space-x-2">
-              <button 
-                onClick={parseEmailContent}
-                disabled={isParsing}
-                className={cn("px-3 py-1.5 text-sm rounded-md flex items-center",
-                  isDark 
-                    ? "bg-blue-600 hover:bg-blue-700 text-white" 
-                    : "bg-blue-500 hover:bg-blue-600 text-white"
-                )}
-              >
-                {isParsing ? (
-                  <>
-                    <RefreshCw className="animate-spin mr-2" size={14} />
-                    {t('parsing')}
-                  </>
-                ) : (
-                  <>
-                    <ArrowRightLeft size={14} className="mr-2" />
-                    {t('parse')}
-                  </>
-                )}
-              </button>
-              <button className={cn("p-2 rounded-md",
-                isDark 
-                  ? "hover:bg-gray-700 text-gray-400" 
-                  : "hover:bg-gray-200 text-gray-600"
-              )}>
-                <MoreHorizontal size={16} />
-              </button>
-            </div>
-          </div>
-          <div className="flex-1 overflow-y-auto p-4">
-            {selectedEmail ? (
-              <>
-                <div className="mb-4">
-                  <h2 className={cn("text-lg font-semibold mb-2", isDark ? "text-gray-100" : "text-gray-900")}>
-                    {selectedEmail.subject}
-                  </h2>
-                  <div className={cn("flex justify-between text-sm mb-4",
-                    isDark ? "text-gray-400" : "text-gray-600"
-                  )}>
-                    <span>{selectedEmail.sender}</span>
-                    <span>{selectedEmail.date}</span>
-                  </div>
-                </div>
-                
-                <div 
-                  className={cn("mb-6", 
-                    isDark ? "text-gray-300" : "text-gray-700"
-                  )}
-                  dangerouslySetInnerHTML={{ __html: selectedEmail.html_content || selectedEmail.content || '<p>No Content</p>' }}
-                />
-                
-                {selectedEmail.attachments.length > 0 && (
-                  <div className="mt-6">
-                    <h3 className={cn("font-medium mb-2", isDark ? "text-gray-300" : "text-gray-700")}>
-                      {t('attachments')} ({selectedEmail.attachments.length})
-                    </h3>
-                    <div className="space-y-2">
-                      {selectedEmail.attachments.map((att, index) => (
-                        <div 
-                          key={`${selectedEmail.id}-${att.id}`} 
-                          className={cn("flex items-center p-2 rounded border",
-                            isDark 
-                              ? "bg-gray-750 border-gray-700 text-gray-300" 
-                              : "bg-gray-50 border-gray-200 text-gray-700"
-                          )}
-                        >
-                          <FileText size={16} className="mr-2 flex-shrink-0" />
-                          <span className="truncate">{att.filename}</span>
-                          <ExternalLink size={14} className="ml-auto flex-shrink-0" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                
-
-
               </>
             ) : (
-              <div className={cn("flex items-center justify-center h-full", 
-                isDark ? "text-gray-500" : "text-gray-400"
-              )}>
-                {t('selectEmailToPreview')}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* 右侧JSON结果区 */}
-<div className={cn("lg:w-1/4 flex-shrink-0 rounded-lg border shadow-sm overflow-hidden flex flex-col",
-          isDark 
-            ? "bg-gray-800 border-gray-700" 
-            : "bg-white border-gray-200"
-        )}>
-          <div className={cn("p-4 border-b flex justify-between items-center",
-            isDark 
-              ? "border-gray-700 bg-gray-750" 
-              : "border-gray-200 bg-gray-50"
-          )}>
-            <h3 className="font-medium">{t('parsedResult')}</h3>
-            <div className="flex space-x-2">
-              {jsonResult && !isParsing && (
-                <button 
-                  onClick={exportJson}
-                  className={cn("p-2 rounded-md",
-                    isDark 
-                      ? "hover:bg-gray-700 text-gray-400" 
-                      : "hover:bg-gray-200 text-gray-600"
-                  )}
-                  title={t('export')}
+              // 富文本编辑器
+              <div className="p-4 h-full flex flex-col flex-1">
+                <h3 className="font-medium mb-4">{t('richTextField')}</h3>
+                <div
+                className="flex-1 h-500 min-h-[500px]"
                 >
-                  <Download size={16} />
-                </button>
-              )}
-              <button className={cn("p-2 rounded-md",
-                isDark 
-                  ? "hover:bg-gray-700 text-gray-400" 
-                  : "hover:bg-gray-200 text-gray-600"
-              )}>
-                <MoreHorizontal size={16} />
-              </button>
-            </div>
-          </div>
-          <div className="flex-1 overflow-y-auto p-4">
-            {isParsing ? (
-              <div className={cn("flex items-center justify-center h-full",
-                isDark ? "text-gray-500" : "text-gray-400"
-              )}>
-                <div className="flex flex-col items-center">
-                  <RefreshCw className="animate-spin mb-3" size={32} />
-                  <p>{t('parsing')}</p>
+                  <Editor
+                    className='workbench-Editor'
+                    defaultConfig={editorConfig}
+                    value={richvalue}
+                    onCreated={setEditor}
+                    onChange={(editor) => setRichValue(editor.getHtml())}
+                    mode="default"
+                    style={{
+                      height: '100%',
+                      width: '100%',
+                    }}
+                  />
                 </div>
               </div>
-            ) : jsonResult ? (
-              <pre className={cn("text-xs whitespace-pre-wrap break-all max-h-full overflow-auto",
-                isDark ? "text-green-400" : "text-green-700"
+            )}
+          </div>
+
+          {/* 中间预览区 - 仅在inbox模式下显示 */}
+          {activeTab === 'inbox' && (
+            <div className={cn("rounded-lg border shadow-sm overflow-hidden flex flex-col",
+              isDark 
+                ? "bg-gray-800 border-gray-700" 
+                : "bg-white border-gray-200"
+            )}>
+              <div className={cn("p-4 border-b",
+                isDark 
+                  ? "border-gray-700 bg-gray-750" 
+                  : "border-gray-200 bg-gray-50"
               )}>
-                {JSON.stringify(jsonResult, null, 2)}
-              </pre>
-            ) : (
-              <div className={cn("flex flex-col items-center justify-center h-full text-center",
-                isDark ? "text-gray-500" : "text-gray-400"
+                <h3 className="font-medium">{t('emailPreview')}</h3>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4">
+                {selectedEmail ? (
+                  <>
+                    <div className="mb-4">
+                      <h2 className={cn("text-lg font-semibold mb-2", isDark ? "text-gray-100" : "text-gray-900")}>
+                        {selectedEmail.subject}
+                      </h2>
+                      <div className={cn("flex justify-between text-sm mb-4",
+                        isDark ? "text-gray-400" : "text-gray-600"
+                      )}>
+                        <span>{selectedEmail.sender}</span>
+                        <span>{selectedEmail.date}</span>
+                      </div>
+                    </div>
+                    
+                    <div 
+                      className={cn("mb-6", 
+                        isDark ? "text-gray-300" : "text-gray-700"
+                      )}
+                      dangerouslySetInnerHTML={{ __html: selectedEmail.html_content || selectedEmail.content || '<p>No Content</p>' }}
+                    />
+                    
+                    {selectedEmail.attachments.length > 0 && (
+                      <div className="mt-6">
+                        <h3 className={cn("font-medium mb-2", isDark ? "text-gray-300" : "text-gray-700")}>
+                          {t('attachments')} ({selectedEmail.attachments.length})
+                        </h3>
+                        <div className="space-y-2">
+                          {selectedEmail.attachments.map((att, index) => (
+                            <div 
+                              key={`${selectedEmail.id}-${att.id}`} 
+                              className={cn("flex items-center p-2 rounded border",
+                                isDark 
+                                  ? "bg-gray-750 border-gray-700 text-gray-300" 
+                                  : "bg-gray-50 border-gray-200 text-gray-700"
+                              )}
+                            >
+                              <FileText size={16} className="mr-2 flex-shrink-0" />
+                              <span className="truncate">{att.filename}</span>
+                              <ExternalLink size={14} className="ml-auto flex-shrink-0" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className={cn("flex items-center justify-center h-full", 
+                    isDark ? "text-gray-500" : "text-gray-400"
+                  )}>
+                    {t('selectEmailToPreview')}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* 右侧解析结果区 */}
+          <div className={cn("rounded-lg border shadow-sm overflow-hidden flex flex-col",
+            isDark 
+              ? "bg-gray-800 border-gray-700" 
+              : "bg-white border-gray-200"
+          )}>
+            <div className={cn("p-4 border-b flex justify-between items-center",
+              isDark 
+                ? "border-gray-700 bg-gray-750" 
+                : "border-gray-200 bg-gray-50"
+            )}>
+              <h3 className="font-medium">{t('parsedResult')}</h3>
+              {/* 结果视图Tab导航 */}
+            {jsonResult && !isParsing && (
+              <div className={cn("p-2 border-b",
+                isDark 
+                  ? "border-gray-700 bg-gray-750" 
+                  : "border-gray-200 bg-gray-50"
               )}>
-                <FileJson size={48} className="mb-3 opacity-50" />
-                <p>{t('parseEmailToSeeResult')}</p>
-                <p className="text-sm mt-1">{t('clickParseButton')}</p>
+                <div className="flex">
+                  <button
+                    className={`px-3 py-1 text-sm font-medium rounded-t ${
+                      resultViewTab === 'json'
+                        ? (isDark 
+                            ? 'bg-gray-800 text-blue-400' 
+                            : 'bg-white text-blue-600')
+                        : (isDark 
+                            ? 'text-gray-400 hover:text-gray-200' 
+                            : 'text-gray-600 hover:text-gray-800')
+                    }`}
+                    onClick={() => setResultViewTab('json')}
+                  >
+                    JSON
+                  </button>
+                  <button
+                    className={`px-3 py-1 text-sm font-medium rounded-t ${
+                      resultViewTab === 'table'
+                        ? (isDark 
+                            ? 'bg-gray-800 text-blue-400' 
+                            : 'bg-white text-blue-600')
+                        : (isDark 
+                            ? 'text-gray-400 hover:text-gray-200' 
+                            : 'text-gray-600 hover:text-gray-800')
+                    }`}
+                    onClick={() => setResultViewTab('table')}
+                  >
+                    {t('table')}
+                  </button>
+                </div>
               </div>
             )}
+              <div className={cn("p-4 border-b flex justify-between items-center",
+              isDark 
+                ? "border-gray-700 bg-gray-750" 
+                : "border-gray-200 bg-gray-50"
+            )}>
+              {/* <h3 className="font-medium">{t('parsedResult')}</h3> */}
+              <div className="flex space-x-2">
+                {jsonResult && !isParsing && (
+                  <button 
+                    onClick={handleExport}
+                    className={cn("p-2 rounded-md",
+                      isDark 
+                        ? "hover:bg-gray-700 text-gray-400" 
+                        : "hover:bg-gray-200 text-gray-600"
+                    )}
+                    title={resultViewTab === 'json' ? t('exportJson') : t('exportExcel')}
+                  >
+                    <Download size={16} />
+                  </button>
+                )}
+              </div>
+            </div>
+            </div>
+            
+  
+            
+            <div className="flex-1 overflow-y-auto p-4">
+              {isParsing ? (
+                <div className={cn("flex items-center justify-center h-full",
+                  isDark ? "text-gray-500" : "text-gray-400"
+                )}>
+                  <div className="flex flex-col items-center">
+                    <RefreshCw className="animate-spin mb-3" size={32} />
+                    <p>{t('parsing')}</p>
+                  </div>
+                </div>
+              ) : jsonResult ? (
+                resultViewTab === 'json' ? (
+                  <pre className={cn("text-xs whitespace-pre-wrap break-all max-h-full overflow-auto",
+                    isDark ? "text-green-400" : "text-green-700"
+                  )}>
+                    {JSON.stringify(jsonResult, null, 2)}
+                  </pre>
+                ) : (
+                  <div className="overflow-auto h-full">
+                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                      <thead className={isDark ? "bg-gray-750" : "bg-gray-50"}>
+                        <tr>
+                          {jsonResult?.result?.prices && jsonResult.result.prices.length > 0 ? (
+                            // 如果存在prices数组，则使用第一个对象的键作为表头
+                            Object.keys(jsonResult.result.prices[0]).map((key) => (
+                              <th 
+                                key={key} 
+                                scope="col" 
+                                className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider"
+                              >
+                                {key}
+                              </th>
+                            ))
+                          ) : (
+                            // 否则使用jsonResult的键作为表头
+                            Object.keys(jsonResult).map((key) => (
+                              <th 
+                                key={key} 
+                                scope="col" 
+                                className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider"
+                              >
+                                {key}
+                              </th>
+                            ))
+                          )}
+                        </tr>
+                      </thead>
+                      <tbody className={cn("divide-y divide-gray-200 dark:divide-gray-700",
+                        isDark ? "bg-gray-800" : "bg-white"
+                      )}>
+                        {jsonResult?.result?.prices && jsonResult.result.prices.length > 0 ? (
+                          // 如果存在prices数组，则遍历每一项作为一行
+                          jsonResult.result.prices.map((priceObj: any, rowIndex: number) => (
+                            <tr key={rowIndex}>
+                              {Object.values(priceObj).map((value: any, index) => (
+                                <td 
+                                  key={index} 
+                                  className="px-3 py-2 whitespace-nowrap text-sm"
+                                >
+                                  {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                                </td>
+                              ))}
+                            </tr>
+                          ))
+                        ) : (
+                          // 否则按照原来的方式显示jsonResult
+                          <tr>
+                            {Object.values(jsonResult).map((value: any, index) => (
+                              <td 
+                                key={index} 
+                                className="px-3 py-2 whitespace-nowrap text-sm"
+                              >
+                                {typeof value === 'object' ? JSON.stringify(value) : String(value)}
+                              </td>
+                            ))}
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                )
+              ) : (
+                <div className={cn("flex flex-col items-center justify-center h-full text-center",
+                  isDark ? "text-gray-500" : "text-gray-400"
+                )}>
+                  <FileJson size={48} className="mb-3 opacity-50" />
+                  <p>{t('parseEmailToSeeResult')}</p>
+                  <p className="text-sm mt-1">{t('clickParseButton')}</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

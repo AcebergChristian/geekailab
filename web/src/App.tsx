@@ -3,6 +3,8 @@ import Home from "@/pages/Home";
 import Layout from "@/pages/Layout";
 import Dash from "@/views/dash";
 import Workbench from "@/views/workbench";
+import Saijia from "@/views/saijia";
+
 import { useState } from "react";
 import { AuthContext } from '@/contexts/authContext';
 import { ThemeProvider } from '@/contexts/themeContext';
@@ -25,7 +27,7 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Layout><Dash /></Layout>} />
             <Route path="/workbench" element={<Layout><Workbench /></Layout>} />
-            <Route path="/evaluation" element={<Layout><div className="text-center text-xl">Evaluation View - Coming Soon</div></Layout>} />
+            <Route path="/saijia" element={<Layout><Saijia /></Layout>} />
             <Route path="/dataset" element={<Layout><div className="text-center text-xl">Dataset View - Coming Soon</div></Layout>} />
             <Route path="/experiment" element={<Layout><div className="text-center text-xl">Experiment View - Coming Soon</div></Layout>} />
             <Route path="/chart" element={<Layout><div className="text-center text-xl">Chart View - Coming Soon</div></Layout>} />

@@ -50,7 +50,7 @@ export default function Home() {
           </p>
           <div className="flex justify-center gap-4">
             <Link 
-              to="/workbench" 
+              to="/dashboard" 
               className="px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
             >
               {t('tryNow')}

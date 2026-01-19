@@ -54,7 +54,7 @@ const Layout: React.FC<{children?: React.ReactNode}> = ({ children }) => {
   const menuItems: MenuItem[] = [
     { id: 'dashboard', icon: <LayoutDashboard size={20} />, label: t('dashboard'), path: '/dashboard' },
     { id: 'workbench', icon: <BarChart3 size={20} />, label: t('workbench'), path: '/workbench' },
-    { id: 'evaluation', icon: <BarChart2 size={20} />, label: t('evaluation'), path: '/evaluation' },
+    { id: 'saijia', icon: <BarChart2 size={20} />, label: t('evaluation'), path: '/saijia' },
     { id: 'dataset', icon: <Database size={20} />, label: t('dataset'), path: '/dataset' },
     { id: 'experiment', icon: <FileText size={20} />, label: t('experiment'), path: '/experiment' },
     { id: 'chart', icon: <PieChart size={20} />, label: t('chart'), path: '/chart' },
