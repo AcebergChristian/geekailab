@@ -243,10 +243,11 @@ const Saijia: React.FC = () => {
             )}>
               <h3 className="font-medium">{t('richTextField')}</h3>
             </div>
-            <div className="flex-1 p-4">
-              <div className="h-[calc(100%-20px)]">
+            <div className="p-4 h-full flex flex-col flex-1">
+              <div
+                className="flex-1 h-500 min-h-[500px]"
+                >
                 <Editor
-                  className='workbench-Editor'
                   defaultConfig={editorConfig}
                   value={richvalue}
                   onCreated={setEditor}

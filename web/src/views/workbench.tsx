@@ -705,7 +705,6 @@ const Workbench: React.FC = () => {
                 className="flex-1 h-500 min-h-[500px]"
                 >
                   <Editor
-                    className='workbench-Editor'
                     defaultConfig={editorConfig}
                     value={richvalue}
                     onCreated={setEditor}
