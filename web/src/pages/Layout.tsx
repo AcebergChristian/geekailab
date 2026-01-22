@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { 
   ChevronDown, Search, Filter, Download, Settings, 
   MoreHorizontal, RefreshCw, User, Bell, Menu, Grid, PieChart,
-  FileText, BarChart2, LayoutDashboard, Moon, Sun, Home, Users, Database, BarChart3
+  FileText, BarChart2, LayoutDashboard, Moon, Sun, Home, Users, Database, BarChart3,
+  ArrowLeftSquareIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useThemeContext } from '@/contexts/themeContext';
@@ -107,7 +108,11 @@ const Layout: React.FC<{children?: React.ReactNode}> = ({ children }) => {
             {language.toUpperCase()}
           </button>
           <SidebarButton icon={<Settings size={20} />} />
-          <SidebarButton icon={<User size={20} />} />
+          <SidebarButton
+            onClick={() => {
+              navigate('/');
+            }}
+            icon={<ArrowLeftSquareIcon size={20} />} />
         </div>
       </aside>
 
