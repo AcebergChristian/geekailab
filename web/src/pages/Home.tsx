@@ -182,14 +182,27 @@ export default function Home() {
           <div className="flex flex-col md:flex-row">
             {/* 左侧文字 */}
             <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-between">
-              <div>
-                <h2 className={`text-4xl md:text-5xl font-bold mb-8 text-center md:text-left ${titleGradient}`}>
-                  智能数据解析平台
-                </h2>
-                <p className={`text-xl text-center md:text-left mb-10 max-w-4xl opacity-90 ${textSecondary}`}>
-                  先进的AI算法驱动，从非结构化数据中自动识别关键信息，实现精准提取和结构化处理
-                </p>
-              </div>
+                {activeTab === 0 && (
+                  <div>
+                    <h2 className={`text-4xl md:text-5xl font-bold mb-8 text-center md:text-left ${titleGradient}`}>
+                      智能数据解析平台
+                    </h2>
+                    <p className={`text-xl text-center md:text-left mb-10 max-w-4xl opacity-90 ${textSecondary}`}>
+                      先进的AI算法驱动，从非结构化数据中自动识别关键信息，实现精准提取和结构化处理
+                    </p>
+                  </div>
+              )}
+              {activeTab === 1 && (
+                <div>
+                  <h2 className={`text-4xl md:text-5xl font-bold mb-8 text-center md:text-left ${titleGradient}`}>
+                    数据提取与结构化
+                  </h2>
+                  <p className={`text-xl text-center md:text-left mb-10 max-w-4xl opacity-90 ${textSecondary}`}>
+                    从复杂数据源中精准提取结构化信息，实现数据自动化处理
+                  </p>
+                </div>
+              )}
+              
 
               <div className="mt-auto">
                 <div className="flex justify-center md:justify-start space-x-4 mb-4">
@@ -218,13 +231,30 @@ export default function Home() {
             </div>
 
             {/* 右侧图片区域 */}
-            <div className="w-full md:w-1/2 flex items-center justify-center p-8 border-l border-emerald-500/20">
+            {/* 右侧图片区域 */}
+            <div className="w-full md:w-1/2 flex items-center justify-center p-8">
               <div className="w-full relative aspect-video rounded-2xl overflow-hidden bg-black border border-emerald-500/30">
                 <div className={`absolute inset-0 flex items-center justify-center ${activeTab === 0 ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
-                  <p className="text-emerald-400/60 font-mono text-xl">[ 运价解析 界面 ]</p>
+                  <video 
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline
+                    className="w-full h-full object-cover rounded-2xl"
+                  >
+                    <source 
+                      src="https://media.istockphoto.com/id/2175395840/video/computer-screen-showing-a-mail-application-receiving-a-large-amount-of-incoming-mail.mp4?s=mp4-640x640-is&k=20&c=pWItrSMIPj6-VKWYcS01v_pT2axjf59VIyIj8aNFqQI=" 
+                      type="video/mp4" 
+                    />
+                    您的浏览器不支持视频播放
+                  </video>
                 </div>
                 <div className={`absolute inset-0 flex items-center justify-center ${activeTab === 1 ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
-                  <p className="text-emerald-400/60 font-mono text-xl">[ 数据提取 界面 ]</p>
+                  <img 
+                    src="https://gbres.dfcfw.com/Files/iimage/20250707/87B01BB5FA7630D92A10A17D274DD19A_w5824h3264.jpg" 
+                    alt="数据提取界面"
+                    className="w-full h-full object-cover rounded-2xl"
+                  />
                 </div>
               </div>
             </div>
@@ -239,9 +269,9 @@ export default function Home() {
         </h2>
         <div className="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto">
           {[
-            { title: "智能识别引擎", desc: "基于深度学习的图像、文本识别技术，准确率高达99%，支持多种数据格式", placeholder: "[ 识别引擎界面截图 ]" },
-            { title: "数据结构化", desc: "将非结构化数据转换为结构化格式，便于存储、查询和分析", placeholder: "[ 数据结构化流程图 ]" },
-            { title: "自动化处理", desc: "从数据采集到入库的全流程自动化，大幅提升数据处理效率", placeholder: "[ 自动化流程示意图 ]" }
+            { title: "智能识别引擎", desc: "基于深度学习的图像、文本识别技术，准确率高达99%，支持多种数据格式", placeholder: "识别引擎" },
+            { title: "数据结构化", desc: "将非结构化数据转换为结构化格式，便于存储、查询和分析", placeholder: "数据结构化" },
+            { title: "自动化处理", desc: "从数据采集到入库的全流程自动化，大幅提升数据处理效率", placeholder: "自动化流程" }
           ].map((item, i) => (
             <div
               key={i}
