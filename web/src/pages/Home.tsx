@@ -55,7 +55,7 @@ export default function Home() {
           <div className="hidden md:flex space-x-10">
             <a href="/" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-emerald-400' : 'text-emerald-700 font-bold'}`}>首页</a>
             <a href="/price" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>价格</a>
-            <a href="/docs" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>文档</a>
+            <a href="/docspage" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>文档</a>
           </div>
           <button className={`
             px-4 py-2 rounded-lg font-medium transition-colors
@@ -160,7 +160,7 @@ export default function Home() {
               开始分析
             </a>
             <Link
-              to="/docs"
+              to="/docspage"
               className={`
                 px-12 py-6 font-bold text-lg rounded-xl border-2 transition-all
                 ${isDark

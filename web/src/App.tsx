@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "@/pages/Home";
-import Docs from "@/pages/Docs";
+import Docs from "@/pages/docs";
 import Price from "@/pages/Price";
 import Layout from "@/pages/Layout";
 import Dash from "@/views/dash";
@@ -28,7 +28,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/price" element={<Price />} />
-            <Route path="/docs" element={<Docs />} />
+            <Route path="/docspage" element={<Docs />} />
             
             <Route path="/dashboard" element={<Layout><Dash /></Layout>} />
             <Route path="/workbench" element={<Layout><Workbench /></Layout>} />

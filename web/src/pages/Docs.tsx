@@ -107,19 +107,11 @@ export default function Docs() {
         rounded-2xl px-6 py-4 shadow-lg
       `}>
         <div className="flex items-center justify-between space-x-6 pl-12">
-          <div className="hidden md:flex space-x-10">
+          <div className="py-2 hidden md:flex space-x-10">
             <a href="/" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>首页</a>
             <a href="/price" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>价格</a>
-            <a href="/docs" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-emerald-400' : 'text-emerald-700 font-bold'}`}>文档</a>
+            <a href="/docspage" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-emerald-400' : 'text-emerald-700 font-bold'}`}>文档</a>
           </div>
-          <button className={`
-            px-4 py-2 rounded-lg font-medium transition-colors
-            ${isDark 
-              ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
-              : 'bg-emerald-600 hover:bg-emerald-500 text-white'}
-          `}>
-            登录
-          </button>
         </div>
       </nav>
 
