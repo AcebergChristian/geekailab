@@ -531,10 +531,83 @@ async def parse_email_content_api(request: dict):
 
 
 
+# 接口 获取前端formData 传过来的文件 
+@app.route('/api/ocr', methods=['POST'])
+def ocr_upload():
+    """
+    处理前端上传的文件，使用OCR解析后获取HTML内容，然后传递给main_parse
+    """
+    try:
+        # 检查是否有文件被上传
+        if 'file' not in request.files:
+            return jsonify({'error': '没有文件被上传'}), 400
+        
+        file = request.files['file']
+        
+        # 检查文件名是否为空
+        if file.filename == '':
+            return jsonify({'error': '文件名为空'}), 400
+        
+        # 检查文件类型
+        allowed_extensions = {'pdf', 'png', 'jpg', 'jpeg', 'bmp', 'tiff', 'webp'}
+        if '.' not in file.filename or \
+           file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
+            return jsonify({'error': f'不支持的文件格式，支持的格式: {allowed_extensions}'}), 400
+        
+        # 保存上传的文件到临时位置
+        import tempfile
+        import os
+        temp_dir = tempfile.mkdtemp()
+        temp_file_path = os.path.join(temp_dir, file.filename)
+        file.save(temp_file_path)
+        
+        try:
+            # 调用OCR解析方法获取HTML内容
+            from utils.ocr import hehe_anylze
+            result = hehe_anylze(temp_file_path)
+            
+            # 从返回的结果中提取HTML内容
+            # 假设返回结果中包含HTML内容的字段名为'html_content'或其他可能的字段名
+            html_content = (
+                result.get("result", {}).get("html_content", "") or
+                result.get("result", {}).get("html", "") or
+                result.get("result", {}).get("content", "") or
+                result.get("data", {}).get("html_content", "") or
+                result.get("data", {}).get("html", "") or
+                result.get("data", {}).get("content", "") or
+                ""
+            )
+            
+            if not html_content:
+                return jsonify({'error': 'OCR解析未返回HTML内容'}), 500
+            
+            # 调用main_parse函数处理HTML内容
+            from app import main_parse  # 导入main_parse函数
+            parsed_result = main_parse(html_content)
+            
+            # 返回解析结果
+            return jsonify({
+                'success': True,
+                'html_content': html_content,
+                'parsed_result': parsed_result
+            })
+            
+        finally:
+            # 清理临时文件
+            import shutil
+            shutil.rmtree(temp_dir)
+    
+    except Exception as e:
+        print(f"OCR处理失败: {str(e)}")
+        return jsonify({'error': f'OCR处理失败: {str(e)}'}), 500
 
 
 
 
+
+
+
+################## 下方为 saijia 的相关接口 ##################
 
 
 def saijia_parse_with_llm(clean_html: str) -> dict:
@@ -660,6 +733,22 @@ def clean_html_content(html_content: str) -> str:
                     del tag[attr]
     
     return str(soup)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ######### 解析saijia邮件正文接口content #########
 @app.post("/api/parse-saijia-content")
