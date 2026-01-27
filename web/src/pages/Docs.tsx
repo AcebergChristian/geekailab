@@ -69,7 +69,7 @@ export default function Docs() {
       let current = '';
 
       sections.forEach(section => {
-        const sectionTop = section.offsetTop;
+        const sectionTop = section.getBoundingClientRect().top;
         if (window.scrollY >= sectionTop - 200) {
           current = section.getAttribute('id') || '';
         }

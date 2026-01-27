@@ -1,11 +1,11 @@
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
- 
+
 import { useState, useMemo, useEffect } from 'react';
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   ReferenceLine, Cell
 } from 'recharts';
-import { 
+import {
   ChevronLeft, Download, MoreHorizontal, RefreshCw, FileText, ExternalLink, FileJson, ArrowRightLeft,
   RotateCcw
 } from 'lucide-react';
@@ -66,22 +66,22 @@ interface EmailListItemProps {
 
 const EmailListItem: React.FC<EmailListItemProps> = ({ email, isSelected, onClick }) => {
   const { isDark } = useThemeContext();
-  
+
   return (
-    <div 
+    <div
       className={cn(
         "p-3 border-b cursor-pointer transition-colors",
-        isDark 
-          ? "border-gray-700 hover:bg-gray-750" 
+        isDark
+          ? "border-gray-700 hover:bg-gray-750"
           : "border-gray-200 hover:bg-gray-100",
-        isSelected 
-          ? (isDark ? "bg-gray-750" : "bg-blue-50") 
+        isSelected
+          ? (isDark ? "bg-gray-750" : "bg-blue-50")
           : ""
       )}
       onClick={onClick}
     >
       <div className="flex items-center mb-1">
-        <span className={cn("font-medium truncate", 
+        <span className={cn("font-medium truncate",
           isDark ? "text-gray-200" : "text-gray-900",
           !email.read && "font-bold"
         )}>
@@ -133,7 +133,7 @@ const Workbench: React.FC = () => {
   const [pageSize, setPageSize] = useState<number>(5); // 每页显示5条
   // 富文本
   const [richvalue, setRichValue] = useState('');
-  
+
 
   // 添加解析结果视图tab状态
   const [resultViewTab, setResultViewTab] = useState<'json' | 'table'>('json');
@@ -142,7 +142,7 @@ const Workbench: React.FC = () => {
   const { theme, toggleTheme, isDark } = useThemeContext();
   const { language, toggleLanguage, t } = useI18nContext();
 
-  
+
   // 获取邮件数据 - 尝试从API获取，失败则使用模拟数据
   const fetchEmails = async (page: number = 1, size: number = 5) => {
     try {
@@ -150,19 +150,19 @@ const Workbench: React.FC = () => {
       const skip = (page - 1) * size;
       // 使用相对路径，通过 Vite 代理配置转发到后端
       const response = await fetch(`/api/emails-with-attachments?skip=${skip}&limit=${size}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const responseData = await response.json();
       const apiData = responseData.data || responseData; // 兼容新旧格式
       const total = responseData.total || apiData.length; // 使用后端返回的total
-      
+
       // 处理API响应数据并转换为组件使用的格式
       const processedEmails = processApiData(apiData);
       setEmails(processedEmails);
-      
+
       // 使用后端返回的总数计算总页数
       setTotalPages(Math.ceil(total / size));
     } catch (error) {
@@ -179,7 +179,7 @@ const Workbench: React.FC = () => {
   // 处理API返回的数据
   const processApiData = (apiData: EmailApiResponse[]): EmailItem[] => {
     const emailMap = new Map<string, EmailItem>();
-    
+
     apiData.forEach(item => {
       if (!emailMap.has(item.email_id)) {
         // 创建新的邮件项
@@ -212,7 +212,7 @@ const Workbench: React.FC = () => {
         }
       }
     });
-    
+
     return Array.from(emailMap.values()).reverse(); // 按时间倒序排列
   };
 
@@ -225,7 +225,7 @@ const Workbench: React.FC = () => {
       date: '2025-01-10 14:30',
       content: '你好，这是Q4季度的财务报告，请查收。\n\n附件包含详细的数据分析表格。',
       html_content: '<p>你好，这是Q4季度的财务报告，请查收。</p><p>附件包含详细的数据分析表格。</p>',
-      attachments: [{id: '1', filename: 'Q4_report.xlsx', file_path: '/attachments/Q4_report.xlsx'}],
+      attachments: [{ id: '1', filename: 'Q4_report.xlsx', file_path: '/attachments/Q4_report.xlsx' }],
       read: false,
       starred: true,
       folder: 'inbox'
@@ -249,7 +249,7 @@ const Workbench: React.FC = () => {
       date: '2025-01-09 16:45',
       content: '尊敬的客户，\n\n您的订单已确认，预计将在3个工作日内发货。\n\n如有任何问题请随时联系我们。',
       html_content: '<p>尊敬的客户，</p><p>您的订单已确认，预计将在3个工作日内发货。</p><p>如有任何问题请随时联系我们。</p>',
-      attachments: [{id: '2', filename: 'order_confirmation.pdf', file_path: '/attachments/order_confirmation.pdf'}],
+      attachments: [{ id: '2', filename: 'order_confirmation.pdf', file_path: '/attachments/order_confirmation.pdf' }],
       read: true,
       starred: false,
       folder: 'inbox'
@@ -261,7 +261,7 @@ const Workbench: React.FC = () => {
       date: '2025-01-09 09:20',
       content: '您好，\n\n我们对贵公司的产品非常感兴趣，希望能进一步探讨合作可能性。\n\n期待您的回复。',
       html_content: '<p>您好，</p><p>我们对贵公司的产品非常感兴趣，希望能进一步探讨合作可能性。</p><p>期待您的回复。</p>',
-      attachments: [{id: '3', filename: 'cooperation_proposal.docx', file_path: '/attachments/cooperation_proposal.docx'}],
+      attachments: [{ id: '3', filename: 'cooperation_proposal.docx', file_path: '/attachments/cooperation_proposal.docx' }],
       read: false,
       starred: true,
       folder: 'inbox'
@@ -305,9 +305,9 @@ const Workbench: React.FC = () => {
   const parseContent = async () => {
     if (activeTab === 'inbox') {
       if (!selectedEmail) return;
-      
+
       setIsParsing(true);
-      
+
       try {
         const response = await fetch('/api/parse-email-content', {
           method: 'POST',
@@ -318,11 +318,11 @@ const Workbench: React.FC = () => {
             html_content: selectedEmail.html_content || selectedEmail.content
           })
         });
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const result = await response.json();
         setJsonResult(result);
       } catch (error) {
@@ -352,7 +352,7 @@ const Workbench: React.FC = () => {
           processing_time: 0,
           success: false
         };
-        
+
         setJsonResult(mockJsonResult);
       } finally {
         setIsParsing(false);
@@ -363,9 +363,9 @@ const Workbench: React.FC = () => {
         alert(t('pleaseEnterRichText'));
         return;
       }
-      
+
       setIsParsing(true);
-      
+
       try {
         const response = await fetch('/api/parse-email-content', {
           method: 'POST',
@@ -376,11 +376,11 @@ const Workbench: React.FC = () => {
             html_content: richvalue
           })
         });
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const result = await response.json();
         setJsonResult(result);
       } catch (error) {
@@ -401,14 +401,14 @@ const Workbench: React.FC = () => {
           processing_time: 0,
           success: false
         };
-        
+
         setJsonResult(mockJsonResult);
       } finally {
         setIsParsing(false);
       }
     }
   };
-  
+
 
   // 重置功能
   const resetResults = () => {
@@ -419,17 +419,17 @@ const Workbench: React.FC = () => {
 
 
 
-  
+
 
   // 导出JSON数据
   const exportJson = () => {
     if (!jsonResult) return;
-    
+
     const dataStr = JSON.stringify(jsonResult, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
     const exportFileDefaultName = `parsed_email_${selectedEmail?.id || 'unknown'}.json`;
-    
+
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
@@ -439,14 +439,14 @@ const Workbench: React.FC = () => {
   // 导出Excel数据
   const exportExcel = () => {
     if (!jsonResult) return;
-    
+
     let csvContent = '';
-    
+
     if (jsonResult?.result?.prices && jsonResult.result.prices.length > 0) {
       // 如果存在prices数组，导出表格数据
       const headers = Object.keys(jsonResult.result.prices[0]);
       csvContent = headers.join(',') + '\n';
-      
+
       jsonResult.result.prices.forEach((priceObj: any) => {
         const values = headers.map(header => {
           const value = priceObj[header];
@@ -462,7 +462,7 @@ const Workbench: React.FC = () => {
       // 否则导出jsonResult的基本结构
       const headers = Object.keys(jsonResult);
       csvContent = headers.join(',') + '\n';
-      
+
       const values = headers.map(header => {
         const value = jsonResult[header];
         if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
@@ -472,10 +472,10 @@ const Workbench: React.FC = () => {
       });
       csvContent += values.join(',') + '\n';
     }
-    
+
     const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
     const exportFileDefaultName = `parsed_data_${selectedEmail?.id || 'unknown'}.csv`;
-    
+
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
@@ -526,14 +526,6 @@ const Workbench: React.FC = () => {
 
 
 
-  
-
-
-
-
-
-
-
 
 
   return (
@@ -547,51 +539,63 @@ const Workbench: React.FC = () => {
         {/* 顶部Tab导航 */}
         <div className="flex justify-center mb-6">
           <div className={cn("inline-flex rounded-md shadow-sm",
-            isDark 
-              ? "bg-gray-800" 
+            isDark
+              ? "bg-gray-800"
               : "bg-white"
           )}>
             <button
               type="button"
-              className={`px-4 py-2 text-sm font-medium rounded-l-lg ${
-                activeTab === 'inbox'
-                  ? (isDark 
-                      ? 'bg-blue-600 text-white border border-blue-600' 
-                      : 'bg-blue-100 text-blue-700 border border-blue-300')
-                  : (isDark 
-                      ? 'text-gray-300 hover:bg-gray-700' 
-                      : 'text-gray-700 hover:bg-gray-100')
-              }`}
+              className={`px-4 py-2 text-sm font-medium rounded-l-lg ${activeTab === 'inbox'
+                ? (isDark
+                  ? 'bg-blue-600 text-white border border-blue-600'
+                  : 'bg-blue-100 text-blue-700 border border-blue-300')
+                : (isDark
+                  ? 'text-gray-300 hover:bg-gray-700'
+                  : 'text-gray-700 hover:bg-gray-100')
+                }`}
               onClick={() => setActiveTab('inbox')}
             >
               {t('inbox')}
             </button>
             <button
               type="button"
-              className={`px-4 py-2 text-sm font-medium rounded-r-lg ${
-                activeTab === 'richText'
-                  ? (isDark 
-                      ? 'bg-blue-600 text-white border border-blue-600' 
-                      : 'bg-blue-100 text-blue-700 border border-blue-300')
-                  : (isDark 
-                      ? 'text-gray-300 hover:bg-gray-700' 
-                      : 'text-gray-700 hover:bg-gray-100')
-              }`}
+              className={`px-4 py-2 text-sm font-medium ${activeTab === 'richText'
+                ? (isDark
+                  ? 'bg-blue-600 text-white border border-blue-600'
+                  : 'bg-blue-100 text-blue-700 border border-blue-300')
+                : (isDark
+                  ? 'text-gray-300 hover:bg-gray-700'
+                  : 'text-gray-700 hover:bg-gray-100')
+                }`}
               onClick={() => setActiveTab('richText')}
             >
-              {t('richTextField')}
+              {t('richText')}
+            </button>
+            <button
+              type="button"
+              className={`px-4 py-2 text-sm font-medium rounded-r-lg ${activeTab === 'ocr'
+                ? (isDark
+                  ? 'bg-blue-600 text-white border border-blue-600'
+                  : 'bg-blue-100 text-blue-700 border border-blue-300')
+                : (isDark
+                  ? 'text-gray-300 hover:bg-gray-700'
+                  : 'text-gray-700 hover:bg-gray-100')
+                }`}
+              onClick={() => setActiveTab('ocr')}
+            >
+              OCR
             </button>
           </div>
         </div>
 
         {/* 控制按钮区 */}
         <div className="flex justify-center mb-6 space-x-3">
-          <button 
+          <button
             onClick={parseContent}
             disabled={isParsing}
             className={cn("px-4 py-2 text-sm rounded-md flex items-center",
-              isDark 
-                ? "bg-blue-600 hover:bg-blue-700 text-white" 
+              isDark
+                ? "bg-blue-600 hover:bg-blue-700 text-white"
                 : "bg-blue-500 hover:bg-blue-600 text-white"
             )}
           >
@@ -607,12 +611,12 @@ const Workbench: React.FC = () => {
               </>
             )}
           </button>
-          
-          <button 
+
+          <button
             onClick={resetResults}
             className={cn("px-4 py-2 text-sm rounded-md flex items-center",
-              isDark 
-                ? "bg-gray-600 hover:bg-gray-700 text-white" 
+              isDark
+                ? "bg-gray-600 hover:bg-gray-700 text-white"
                 : "bg-gray-300 hover:bg-gray-400 text-gray-800"
             )}
           >
@@ -621,88 +625,166 @@ const Workbench: React.FC = () => {
           </button>
         </div>
 
+
+
         {/* 主工作区 */}
-        <div className={`grid grid-cols-1 ${activeTab === 'inbox' ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} gap-4 h-[calc(100vh-280px)]`}>
+        <div className={`grid grid-cols-1 ${activeTab === 'inbox' ? 'lg:grid-cols-2' : 'lg:grid-cols-2'} gap-4 h-[calc(100vh-280px)]`}>
           {/* 左侧区域 */}
           <div className={cn("rounded-lg border shadow-sm overflow-hidden flex flex-col",
-            isDark 
-              ? "bg-gray-800 border-gray-700" 
+            isDark
+              ? "bg-gray-800 border-gray-700"
               : "bg-white border-gray-200"
           )}>
-            {activeTab === 'inbox' ? (
-              <>
-                {/* 邮件列表标题 */}
-                <div className={cn("p-4 border-b",
-                  isDark 
-                    ? "border-gray-700 bg-gray-750" 
-                    : "border-gray-200 bg-gray-50"
-                )}>
-                  <h3 className="font-medium">{t('emailList')}</h3>
-                </div>
-                
+
+
+            {activeTab === 'inbox' && (
+              <div className="flex flex-1 h-full">
                 {/* 邮件列表 */}
-                <div className="flex flex-col flex-1 h-full overflow-y-auto">
-                  <div className="h-[100%] overflow-y-auto">
-                    {emails.map(email => (
-                      <EmailListItem 
-                        key={email.id}
-                        email={email}
-                        isSelected={selectedEmail?.id === email.id}
-                        onClick={() => setSelectedEmailId(email.id)}
-                      />
-                    ))}
-                  </div>
-                  
-                  {/* 分页按钮栏 */}
-                  <div className={cn("p-2 border-t flex items-center justify-between mb-0",
-                    isDark 
-                      ? "border-gray-700 bg-gray-750" 
+                <div className={cn("w-1/3 border-r flex flex-col",
+                  isDark
+                    ? "border-gray-700 bg-gray-800"
+                    : "border-gray-200 bg-white"
+                )}>
+                  {/* 邮件列表标题 */}
+                  <div className={cn("p-4 border-b",
+                    isDark
+                      ? "border-gray-700 bg-gray-750"
                       : "border-gray-200 bg-gray-50"
                   )}>
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className={cn("px-3 py-1 rounded text-sm",
-                        currentPage === 1 
-                          ? (isDark ? "text-gray-600" : "text-gray-400") 
-                          : (isDark 
-                            ? "text-gray-300 hover:bg-gray-700" 
-                            : "text-gray-700 hover:bg-gray-200")
-                      )}
-                    >
-                      {t('previous')}
-                    </button>
-                    
-                    <span className={cn("text-sm", isDark ? "text-gray-300" : "text-gray-700")}>
-                      {t('page')} {currentPage} {t('of')} {totalPages}
-                    </span>
-                    
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      className={cn("px-3 py-1 rounded text-sm",
-                        currentPage === totalPages 
-                          ? (isDark ? "text-gray-600" : "text-gray-400") 
-                          : (isDark 
-                            ? "text-gray-300 hover:bg-gray-700" 
-                            : "text-gray-700 hover:bg-gray-200")
-                      )}
-                    >
-                      {t('next')}
-                    </button>
+                    <h3 className="font-medium">{t('emailList')}</h3>
                   </div>
 
+                  {/* 邮件列表 */}
+                  <div className="flex flex-col flex-1 h-full overflow-y-auto">
+                    <div className="h-[100%] overflow-y-auto">
+                      {emails.map(email => (
+                        <EmailListItem
+                          key={email.id}
+                          email={email}
+                          isSelected={selectedEmail?.id === email.id}
+                          onClick={() => setSelectedEmailId(email.id)}
+                        />
+                      ))}
+                    </div>
 
+                    {/* 分页按钮栏 */}
+                    <div className={cn("p-2 border-t flex items-center justify-between mb-0",
+                      isDark
+                        ? "border-gray-700 bg-gray-750"
+                        : "border-gray-200 bg-gray-50"
+                    )}>
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className={cn("px-3 py-1 rounded text-sm",
+                          currentPage === 1
+                            ? (isDark ? "text-gray-600" : "text-gray-400")
+                            : (isDark
+                              ? "text-gray-300 hover:bg-gray-700"
+                              : "text-gray-700 hover:bg-gray-200")
+                        )}
+                      >
+                        {t('previous')}
+                      </button>
 
+                      <span className={cn("text-sm", isDark ? "text-gray-300" : "text-gray-700")}>
+                        {t('page')} {currentPage} {t('of')} {totalPages}
+                      </span>
 
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className={cn("px-3 py-1 rounded text-sm",
+                          currentPage === totalPages
+                            ? (isDark ? "text-gray-600" : "text-gray-400")
+                            : (isDark
+                              ? "text-gray-300 hover:bg-gray-700"
+                              : "text-gray-700 hover:bg-gray-200")
+                        )}
+                      >
+                        {t('next')}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </>
-            ) : (
+
+                {/* 邮件详情 */}
+                <div className={cn("w-2/3 rounded-lg border shadow-sm overflow-hidden flex flex-col",
+                  isDark
+                    ? "bg-gray-800 border-gray-700"
+                    : "bg-white border-gray-200"
+                )}>
+                  <div className={cn("p-4 border-b",
+                    isDark
+                      ? "border-gray-700 bg-gray-750"
+                      : "border-gray-200 bg-gray-50"
+                  )}>
+                    <h3 className="font-medium">{t('emailPreview')}</h3>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-4">
+                    {selectedEmail ? (
+                      <>
+                        <div className="mb-4">
+                          <h2 className={cn("text-lg font-semibold mb-2", isDark ? "text-gray-100" : "text-gray-900")}>
+                            {selectedEmail.subject}
+                          </h2>
+                          <div className={cn("flex justify-between text-sm mb-4",
+                            isDark ? "text-gray-400" : "text-gray-600"
+                          )}>
+                            <span>{selectedEmail.sender}</span>
+                            <span>{selectedEmail.date}</span>
+                          </div>
+                        </div>
+
+                        <div
+                          className={cn("mb-6",
+                            isDark ? "text-gray-300" : "text-gray-700"
+                          )}
+                          dangerouslySetInnerHTML={{ __html: selectedEmail.html_content || selectedEmail.content || '<p>No Content</p>' }}
+                        />
+
+                        {selectedEmail.attachments.length > 0 && (
+                          <div className="mt-6">
+                            <h3 className={cn("font-medium mb-2", isDark ? "text-gray-300" : "text-gray-700")}>
+                              {t('attachments')} ({selectedEmail.attachments.length})
+                            </h3>
+                            <div className="space-y-2">
+                              {selectedEmail.attachments.map((att, index) => (
+                                <div
+                                  key={`${selectedEmail.id}-${att.id}`}
+                                  className={cn("flex items-center p-2 rounded border",
+                                    isDark
+                                      ? "bg-gray-750 border-gray-700 text-gray-300"
+                                      : "bg-gray-50 border-gray-200 text-gray-700"
+                                  )}
+                                >
+                                  <FileText size={16} className="mr-2 flex-shrink-0" />
+                                  <span className="truncate">{att.filename}</span>
+                                  <ExternalLink size={14} className="ml-auto flex-shrink-0" />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className={cn("flex items-center justify-center h-full",
+                        isDark ? "text-gray-500" : "text-gray-400"
+                      )}>
+                        {t('selectEmailToPreview')}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'richText' && (
               // 富文本编辑器
               <div className="p-4 h-full flex flex-col flex-1">
                 <h3 className="font-medium mb-4">{t('richTextField')}</h3>
                 <div
-                className="flex-1 h-500 min-h-[500px]"
+                  className="flex-1 h-500 min-h-[500px]"
                 >
                   <Editor
                     defaultConfig={editorConfig}
@@ -718,156 +800,132 @@ const Workbench: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {activeTab === 'ocr' && (
+              <div className="h-full flex flex-col">
+                {/* 左侧上传面板 */}
+                <div className={`flex-1 flex flex-col ${isDark ? 'bg-gray-800' : 'bg-white'} p-4`}>
+                  <h3 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>OCR 文档解析</h3>
+                  <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-8">
+                    <div className="text-center mb-6">
+                      <svg className={`mx-auto h-12 w-12 ${isDark ? 'text-gray-400' : 'text-gray-300'}`} stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      <h3 className={`mt-2 text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>拖拽文件到此处或点击上传</h3>
+                      <p className={`mt-1 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>支持 JPG、PNG、PDF 等格式</p>
+                    </div>
+                    <input
+                      type="file"
+                      multiple
+                      accept=".jpg,.jpeg,.png,.pdf"
+                      className="hidden"
+                      id="file-upload-ocr"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files.length > 0) {
+                          // 处理文件上传
+                        }
+                      }}
+                    />
+                    <label
+                      htmlFor="file-upload-ocr"
+                      className={`relative cursor-pointer rounded-md font-medium ${isDark ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-500'} focus-within:outline-none focus-within:ring-2 focus-within:ring-emerald-500 focus-within:ring-offset-2`}
+                    >
+                      <span>选择文件</span>
+                    </label>
+                  </div>
+
+                  {/* 已上传文件列表 */}
+                  <div className="mt-4">
+                    <h4 className={`text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>已上传文件</h4>
+                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                      {/* 这里可以显示已上传的文件列表 */}
+                    </div>
+
+                  </div>
+                </div>
+
+                
+              </div>
+            )}
           </div>
 
-          {/* 中间预览区 - 仅在inbox模式下显示 */}
-          {activeTab === 'inbox' && (
-            <div className={cn("rounded-lg border shadow-sm overflow-hidden flex flex-col",
-              isDark 
-                ? "bg-gray-800 border-gray-700" 
-                : "bg-white border-gray-200"
-            )}>
-              <div className={cn("p-4 border-b",
-                isDark 
-                  ? "border-gray-700 bg-gray-750" 
-                  : "border-gray-200 bg-gray-50"
-              )}>
-                <h3 className="font-medium">{t('emailPreview')}</h3>
-              </div>
-              <div className="flex-1 overflow-y-auto p-4">
-                {selectedEmail ? (
-                  <>
-                    <div className="mb-4">
-                      <h2 className={cn("text-lg font-semibold mb-2", isDark ? "text-gray-100" : "text-gray-900")}>
-                        {selectedEmail.subject}
-                      </h2>
-                      <div className={cn("flex justify-between text-sm mb-4",
-                        isDark ? "text-gray-400" : "text-gray-600"
-                      )}>
-                        <span>{selectedEmail.sender}</span>
-                        <span>{selectedEmail.date}</span>
-                      </div>
-                    </div>
-                    
-                    <div 
-                      className={cn("mb-6", 
-                        isDark ? "text-gray-300" : "text-gray-700"
-                      )}
-                      dangerouslySetInnerHTML={{ __html: selectedEmail.html_content || selectedEmail.content || '<p>No Content</p>' }}
-                    />
-                    
-                    {selectedEmail.attachments.length > 0 && (
-                      <div className="mt-6">
-                        <h3 className={cn("font-medium mb-2", isDark ? "text-gray-300" : "text-gray-700")}>
-                          {t('attachments')} ({selectedEmail.attachments.length})
-                        </h3>
-                        <div className="space-y-2">
-                          {selectedEmail.attachments.map((att, index) => (
-                            <div 
-                              key={`${selectedEmail.id}-${att.id}`} 
-                              className={cn("flex items-center p-2 rounded border",
-                                isDark 
-                                  ? "bg-gray-750 border-gray-700 text-gray-300" 
-                                  : "bg-gray-50 border-gray-200 text-gray-700"
-                              )}
-                            >
-                              <FileText size={16} className="mr-2 flex-shrink-0" />
-                              <span className="truncate">{att.filename}</span>
-                              <ExternalLink size={14} className="ml-auto flex-shrink-0" />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className={cn("flex items-center justify-center h-full", 
-                    isDark ? "text-gray-500" : "text-gray-400"
-                  )}>
-                    {t('selectEmailToPreview')}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+
 
           {/* 右侧解析结果区 */}
           <div className={cn("rounded-lg border shadow-sm overflow-hidden flex flex-col",
-            isDark 
-              ? "bg-gray-800 border-gray-700" 
+            isDark
+              ? "bg-gray-800 border-gray-700"
               : "bg-white border-gray-200"
           )}>
             <div className={cn("p-4 border-b flex justify-between items-center",
-              isDark 
-                ? "border-gray-700 bg-gray-750" 
+              isDark
+                ? "border-gray-700 bg-gray-750"
                 : "border-gray-200 bg-gray-50"
             )}>
               <h3 className="font-medium">{t('parsedResult')}</h3>
               {/* 结果视图Tab导航 */}
-            {jsonResult && !isParsing && (
-              <div className={cn("p-2 border-b",
-                isDark 
-                  ? "border-gray-700 bg-gray-750" 
+              {jsonResult && !isParsing && (
+                <div className={cn("p-2 border-b",
+                  isDark
+                    ? "border-gray-700 bg-gray-750"
+                    : "border-gray-200 bg-gray-50"
+                )}>
+                  <div className="flex">
+                    <button
+                      className={`px-3 py-1 text-sm font-medium rounded-t ${resultViewTab === 'json'
+                        ? (isDark
+                          ? 'bg-gray-800 text-blue-400'
+                          : 'bg-white text-blue-600')
+                        : (isDark
+                          ? 'text-gray-400 hover:text-gray-200'
+                          : 'text-gray-600 hover:text-gray-800')
+                        }`}
+                      onClick={() => setResultViewTab('json')}
+                    >
+                      JSON
+                    </button>
+                    <button
+                      className={`px-3 py-1 text-sm font-medium rounded-t ${resultViewTab === 'table'
+                        ? (isDark
+                          ? 'bg-gray-800 text-blue-400'
+                          : 'bg-white text-blue-600')
+                        : (isDark
+                          ? 'text-gray-400 hover:text-gray-200'
+                          : 'text-gray-600 hover:text-gray-800')
+                        }`}
+                      onClick={() => setResultViewTab('table')}
+                    >
+                      {t('table')}
+                    </button>
+                  </div>
+                </div>
+              )}
+              <div className={cn("p-4 border-b flex justify-between items-center",
+                isDark
+                  ? "border-gray-700 bg-gray-750"
                   : "border-gray-200 bg-gray-50"
               )}>
-                <div className="flex">
-                  <button
-                    className={`px-3 py-1 text-sm font-medium rounded-t ${
-                      resultViewTab === 'json'
-                        ? (isDark 
-                            ? 'bg-gray-800 text-blue-400' 
-                            : 'bg-white text-blue-600')
-                        : (isDark 
-                            ? 'text-gray-400 hover:text-gray-200' 
-                            : 'text-gray-600 hover:text-gray-800')
-                    }`}
-                    onClick={() => setResultViewTab('json')}
-                  >
-                    JSON
-                  </button>
-                  <button
-                    className={`px-3 py-1 text-sm font-medium rounded-t ${
-                      resultViewTab === 'table'
-                        ? (isDark 
-                            ? 'bg-gray-800 text-blue-400' 
-                            : 'bg-white text-blue-600')
-                        : (isDark 
-                            ? 'text-gray-400 hover:text-gray-200' 
-                            : 'text-gray-600 hover:text-gray-800')
-                    }`}
-                    onClick={() => setResultViewTab('table')}
-                  >
-                    {t('table')}
-                  </button>
+                {/* <h3 className="font-medium">{t('parsedResult')}</h3> */}
+                <div className="flex space-x-2">
+                  {jsonResult && !isParsing && (
+                    <button
+                      onClick={handleExport}
+                      className={cn("p-2 rounded-md",
+                        isDark
+                          ? "hover:bg-gray-700 text-gray-400"
+                          : "hover:bg-gray-200 text-gray-600"
+                      )}
+                      title={resultViewTab === 'json' ? t('exportJson') : t('exportExcel')}
+                    >
+                      <Download size={16} />
+                    </button>
+                  )}
                 </div>
               </div>
-            )}
-              <div className={cn("p-4 border-b flex justify-between items-center",
-              isDark 
-                ? "border-gray-700 bg-gray-750" 
-                : "border-gray-200 bg-gray-50"
-            )}>
-              {/* <h3 className="font-medium">{t('parsedResult')}</h3> */}
-              <div className="flex space-x-2">
-                {jsonResult && !isParsing && (
-                  <button 
-                    onClick={handleExport}
-                    className={cn("p-2 rounded-md",
-                      isDark 
-                        ? "hover:bg-gray-700 text-gray-400" 
-                        : "hover:bg-gray-200 text-gray-600"
-                    )}
-                    title={resultViewTab === 'json' ? t('exportJson') : t('exportExcel')}
-                  >
-                    <Download size={16} />
-                  </button>
-                )}
-              </div>
             </div>
-            </div>
-            
-  
-            
+
+
+
             <div className="flex-1 overflow-y-auto p-4">
               {isParsing ? (
                 <div className={cn("flex items-center justify-center h-full",
@@ -893,9 +951,9 @@ const Workbench: React.FC = () => {
                           {jsonResult?.result?.prices && jsonResult.result.prices.length > 0 ? (
                             // 如果存在prices数组，则使用第一个对象的键作为表头
                             Object.keys(jsonResult.result.prices[0]).map((key) => (
-                              <th 
-                                key={key} 
-                                scope="col" 
+                              <th
+                                key={key}
+                                scope="col"
                                 className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider"
                               >
                                 {key}
@@ -904,9 +962,9 @@ const Workbench: React.FC = () => {
                           ) : (
                             // 否则使用jsonResult的键作为表头
                             Object.keys(jsonResult).map((key) => (
-                              <th 
-                                key={key} 
-                                scope="col" 
+                              <th
+                                key={key}
+                                scope="col"
                                 className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider"
                               >
                                 {key}
@@ -923,8 +981,8 @@ const Workbench: React.FC = () => {
                           jsonResult.result.prices.map((priceObj: any, rowIndex: number) => (
                             <tr key={rowIndex}>
                               {Object.values(priceObj).map((value: any, index) => (
-                                <td 
-                                  key={index} 
+                                <td
+                                  key={index}
                                   className="px-3 py-2 whitespace-nowrap text-sm"
                                 >
                                   {typeof value === 'object' ? JSON.stringify(value) : String(value)}
@@ -936,8 +994,8 @@ const Workbench: React.FC = () => {
                           // 否则按照原来的方式显示jsonResult
                           <tr>
                             {Object.values(jsonResult).map((value: any, index) => (
-                              <td 
-                                key={index} 
+                              <td
+                                key={index}
                                 className="px-3 py-2 whitespace-nowrap text-sm"
                               >
                                 {typeof value === 'object' ? JSON.stringify(value) : String(value)}
