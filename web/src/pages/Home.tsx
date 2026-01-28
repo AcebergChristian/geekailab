@@ -7,11 +7,7 @@ export default function Home() {
   const { isDark } = useThemeContext();
   const { t } = useI18nContext();
 
-  // 控制登录模态框的显示和隐藏
-  const [showLoginModal, setShowLoginModal] = useState(false);
-
-
-   // 用于切换标签页
+  // 用于切换标签页
   const [activeTab, setActiveTab] = React.useState(0);
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -43,95 +39,6 @@ export default function Home() {
       ${textPrimary} font-sans antialiased
     `}>
 
-       {/* 导航栏 */}
-      <nav className={`
-        w-1/2 fixed top-6 left-1/2 transform -translate-x-1/2 z-50
-        ${isDark 
-          ? 'bg-gray-900/70 backdrop-blur-md' 
-          : 'bg-white/80 backdrop-blur-md'}
-        rounded-2xl px-6 py-4 shadow-lg
-      `}>
-        <div className="flex items-center justify-between space-x-6 pl-12">
-          <div className="hidden md:flex space-x-10">
-            <a href="/" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-emerald-400' : 'text-emerald-700 font-bold'}`}>首页</a>
-            <a href="/price" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>价格</a>
-            <a href="/docspage" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>文档</a>
-          </div>
-          <button className={`
-            px-4 py-2 rounded-lg font-medium transition-colors
-            ${isDark 
-              ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
-              : 'bg-emerald-600 hover:bg-emerald-500 text-white'}
-          `}
-          onClick={() => setShowLoginModal(true)}
-          >
-            登录
-          </button>
-        </div>
-      </nav>
-
-
-      {/* 登录模态框 */}
-      {showLoginModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className={`
-            w-full max-w-md rounded-2xl p-8 relative
-            ${isDark
-              ? 'bg-gray-900/90 border-none'
-              : 'bg-white/90 border-none'}
-          `}>
-            <button
-              onClick={() => setShowLoginModal(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-300"
-            >
-              ✕
-            </button>
-            <h2 className="text-2xl font-bold mb-6 text-center text-emerald-400">登录 | 注册</h2>
-            <form className="space-y-4">
-              <div>
-                <label className={`block mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>邮箱</label>
-                <input
-                  type="email"
-                  className={`
-                    w-full px-4 py-3 rounded-lg border outline-none
-                    ${isDark
-                      ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-500'
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-emerald-500'}
-                  `}
-                  placeholder="请输入邮箱地址"
-                />
-              </div>
-              <div>
-                <label className={`block mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>密码</label>
-                <input
-                  type="password"
-                  className={`
-                    w-full px-4 py-3 rounded-lg border outline-none
-                    ${isDark
-                      ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-500'
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-emerald-500'}
-                  `}
-                  placeholder="请输入密码"
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg transition-colors"
-              >
-                登录
-              </button>
-              <div className="text-center mt-4">
-                <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                  还没有账户？
-                  <a href="" className="text-emerald-400 hover:underline">立即注册</a>
-                </p>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-
 
       {/* Hero */}
       <header className="relative">
@@ -141,15 +48,18 @@ export default function Home() {
         <div className="container mx-auto px-6 pt-40 pb-32 text-center relative z-10">
           <h1 className={`text-5xl md:text-7xl font-extrabold mb-6 tracking-tight ${titleGradient}`}>
             Geek AI LAB
-            <br />
-            Geek 人工智能 实验室
           </h1>
+          <br />
+          <br />
+          <h5 className={`text-gray-500 text-3xl md:text-3xl font-extrabold mb-6 tracking-tight`}>
+            Geek 人工智能 实验室
+          </h5>
           <p className={`text-xl md:text-2xl max-w-4xl mx-auto mb-12 opacity-90 ${textSecondary}`}>
             解析 · 提取 · 结构化 · 智能识别 · 数据自动化
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-6">
             <a
-              href="/dashboard"
+              href="/system/dashboard"
               className={`
                 px-12 py-6 bg-gradient-to-r from-emerald-700 to-teal-700 
                 hover:from-emerald-600 hover:to-teal-600 
@@ -160,7 +70,7 @@ export default function Home() {
               开始分析
             </a>
             <Link
-              to="/docspage"
+              to="/docs"
               className={`
                 px-12 py-6 font-bold text-lg rounded-xl border-2 transition-all
                 ${isDark
@@ -182,15 +92,15 @@ export default function Home() {
           <div className="flex flex-col md:flex-row">
             {/* 左侧文字 */}
             <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-between">
-                {activeTab === 0 && (
-                  <div>
-                    <h2 className={`text-4xl md:text-5xl font-bold mb-8 text-center md:text-left ${titleGradient}`}>
-                      智能数据解析平台
-                    </h2>
-                    <p className={`text-xl text-center md:text-left mb-10 max-w-4xl opacity-90 ${textSecondary}`}>
-                      先进的AI算法驱动，从非结构化数据中自动识别关键信息，实现精准提取和结构化处理
-                    </p>
-                  </div>
+              {activeTab === 0 && (
+                <div>
+                  <h2 className={`text-4xl md:text-5xl font-bold mb-8 text-center md:text-left ${titleGradient}`}>
+                    智能数据解析平台
+                  </h2>
+                  <p className={`text-xl text-center md:text-left mb-10 max-w-4xl opacity-90 ${textSecondary}`}>
+                    先进的AI算法驱动，从非结构化数据中自动识别关键信息，实现精准提取和结构化处理
+                  </p>
+                </div>
               )}
               {activeTab === 1 && (
                 <div>
@@ -202,7 +112,7 @@ export default function Home() {
                   </p>
                 </div>
               )}
-              
+
 
               <div className="mt-auto">
                 <div className="flex justify-center md:justify-start space-x-4 mb-4">
@@ -210,12 +120,12 @@ export default function Home() {
                     <button
                       key={index}
                       className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${activeTab === index
-                          ? isDark
-                            ? 'bg-emerald-800/70 text-emerald-100 border border-emerald-500/50'
-                            : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                          : isDark
-                            ? 'bg-gray-900 text-gray-300 hover:bg-gray-800'
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        ? isDark
+                          ? 'bg-emerald-800/70 text-emerald-100 border border-emerald-500/50'
+                          : 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                        : isDark
+                          ? 'bg-gray-900 text-gray-300 hover:bg-gray-800'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                         }`}
                       onClick={() => setActiveTab(index)}
                     >
@@ -235,23 +145,23 @@ export default function Home() {
             <div className="w-full md:w-1/2 flex items-center justify-center p-8">
               <div className="w-full relative aspect-video rounded-2xl overflow-hidden bg-black border border-emerald-500/30">
                 <div className={`absolute inset-0 flex items-center justify-center ${activeTab === 0 ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
-                  <video 
-                    autoPlay 
-                    loop 
-                    muted 
+                  <video
+                    autoPlay
+                    loop
+                    muted
                     playsInline
                     className="w-full h-full object-cover rounded-2xl"
                   >
-                    <source 
-                      src="https://media.istockphoto.com/id/2175395840/video/computer-screen-showing-a-mail-application-receiving-a-large-amount-of-incoming-mail.mp4?s=mp4-640x640-is&k=20&c=pWItrSMIPj6-VKWYcS01v_pT2axjf59VIyIj8aNFqQI=" 
-                      type="video/mp4" 
+                    <source
+                      src="https://media.istockphoto.com/id/2175395840/video/computer-screen-showing-a-mail-application-receiving-a-large-amount-of-incoming-mail.mp4?s=mp4-640x640-is&k=20&c=pWItrSMIPj6-VKWYcS01v_pT2axjf59VIyIj8aNFqQI="
+                      type="video/mp4"
                     />
                     您的浏览器不支持视频播放
                   </video>
                 </div>
                 <div className={`absolute inset-0 flex items-center justify-center ${activeTab === 1 ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}>
-                  <img 
-                    src="https://gbres.dfcfw.com/Files/iimage/20250707/87B01BB5FA7630D92A10A17D274DD19A_w5824h3264.jpg" 
+                  <img
+                    src="https://gbres.dfcfw.com/Files/iimage/20250707/87B01BB5FA7630D92A10A17D274DD19A_w5824h3264.jpg"
                     alt="数据提取界面"
                     className="w-full h-full object-cover rounded-2xl"
                   />

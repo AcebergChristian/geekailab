@@ -16,7 +16,7 @@ export default function Price() {
   // 计算价格
   const calculatePrice = () => {
     let basePrice = 0;
-    
+
     // 邮件处理费用
     if (emailCount <= 20) {
       basePrice += 0;
@@ -25,23 +25,23 @@ export default function Price() {
     } else {
       basePrice += 90 + (emailCount - 200) * 0.005;
     }
-    
+
     // 邮件类型费用
     basePrice += emailTypes * 10;
-    
+
     // PDF处理费用
     basePrice += pdfCount * 0.1;
-    
+
     // 图片处理费用
     basePrice += imageCount * 0.05;
-    
+
     // 模型类型系数
     if (modelType === 'advanced') {
       basePrice *= 1.5;
     } else if (modelType === 'enterprise') {
       basePrice *= 2.0;
     }
-    
+
     return Math.max(basePrice, 0).toFixed(2);
   };
 
@@ -95,35 +95,11 @@ export default function Price() {
   return (
     <div className={`
       min-h-screen
-      ${isDark 
-        ? 'bg-gradient-to-b from-gray-950 via-gray-900 to-black text-gray-100' 
+      ${isDark
+        ? 'bg-gradient-to-b from-gray-950 via-gray-900 to-black text-gray-100'
         : 'bg-gradient-to-b from-gray-50 to-gray-200 text-gray-900'}
       font-sans antialiased
     `}>
-      {/* 导航栏 */}
-      <nav className={`
-        w-1/2 fixed top-6 left-1/2 transform -translate-x-1/2 z-50
-        ${isDark 
-          ? 'bg-gray-900/70 backdrop-blur-md' 
-          : 'bg-white/80 backdrop-blur-md'}
-        rounded-2xl px-6 py-4 shadow-lg
-      `}>
-        <div className="flex items-center justify-between space-x-6 pl-12">
-          <div className="py-2 hidden md:flex space-x-10">
-            <a href="/" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>首页</a>
-            <a href="/price" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-emerald-400' : 'text-emerald-700 font-bold'}`}>价格</a>
-            <a href="/docspage" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>文档</a>
-          </div>
-          {/* <button className={`
-            px-4 py-2 rounded-lg font-medium transition-colors
-            ${isDark 
-              ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
-              : 'bg-emerald-600 hover:bg-emerald-500 text-white'}
-          `}>
-            登录
-          </button> */}
-        </div>
-      </nav>
 
       <div className="pt-40 container mx-auto px-6 py-12">
         {/* 页面标题 */}
@@ -140,16 +116,16 @@ export default function Price() {
         <section className="mb-20">
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {plans.map((plan, index) => (
-              <div 
+              <div
                 key={index}
                 className={`
                   rounded-2xl p-8 border
-                  ${plan.highlight 
-                    ? (isDark 
-                      ? 'border-emerald-500 bg-gray-900/60 shadow-xl shadow-emerald-900/20' 
+                  ${plan.highlight
+                    ? (isDark
+                      ? 'border-emerald-500 bg-gray-900/60 shadow-xl shadow-emerald-900/20'
                       : 'border-emerald-600 bg-white shadow-xl shadow-emerald-200/30')
-                    : (isDark 
-                      ? 'border-emerald-500/30 bg-gray-900/50' 
+                    : (isDark
+                      ? 'border-emerald-500/30 bg-gray-900/50'
                       : 'border-gray-300 bg-white')}
                   transition-all hover:scale-105 relative overflow-hidden
                 `}
@@ -180,13 +156,13 @@ export default function Price() {
                     </li>
                   ))}
                 </ul>
-                <button 
+                <button
                   className={`
                     w-full py-3 rounded-lg font-semibold transition-colors
-                    ${plan.highlight 
-                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
-                      : isDark 
-                        ? 'bg-gray-800 hover:bg-gray-700 text-gray-200 border border-emerald-500/30' 
+                    ${plan.highlight
+                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                      : isDark
+                        ? 'bg-gray-800 hover:bg-gray-700 text-gray-200 border border-emerald-500/30'
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-300'}
                   `}
                 >
@@ -201,8 +177,8 @@ export default function Price() {
         <section className="max-w-4xl mx-auto">
           <div className={`
             rounded-3xl p-8 md:p-12 border
-            ${isDark 
-              ? 'border-emerald-500/30 bg-gray-900/70 backdrop-blur-md' 
+            ${isDark
+              ? 'border-emerald-500/30 bg-gray-900/70 backdrop-blur-md'
               : 'border-emerald-500/30 bg-white/80 backdrop-blur-md'}
             shadow-2xl shadow-emerald-950/20
           `}>
@@ -212,7 +188,7 @@ export default function Price() {
             <p className="text-center mb-10 opacity-90">
               输入您的使用量，计算个性化价格
             </p>
-            
+
             <div className="grid md:grid-cols-2 gap-8">
               <div className="space-y-6">
                 <div>
@@ -235,7 +211,7 @@ export default function Price() {
                     <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>1000</span>
                   </div>
                 </div>
-                
+
                 <div>
                   <label className={`block mb-2 font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                     邮件内容类型数量
@@ -248,13 +224,13 @@ export default function Price() {
                     onChange={(e) => setEmailTypes(Math.min(100, Math.max(1, Number(e.target.value))))}
                     className={`
                       w-full px-4 py-3 rounded-lg border outline-none
-                      ${isDark 
-                        ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-500' 
+                      ${isDark
+                        ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-500'
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-emerald-500'}
                     `}
                   />
                 </div>
-                
+
                 <div>
                   <label className={`block mb-2 font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                     PDF文档数量 (每月)
@@ -267,13 +243,13 @@ export default function Price() {
                     onChange={(e) => setPdfCount(Math.min(10000, Math.max(0, Number(e.target.value))))}
                     className={`
                       w-full px-4 py-3 rounded-lg border outline-none
-                      ${isDark 
-                        ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-500' 
+                      ${isDark
+                        ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-500'
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-emerald-500'}
                     `}
                   />
                 </div>
-                
+
                 <div>
                   <label className={`block mb-2 font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                     图片数量 (每月)
@@ -286,14 +262,14 @@ export default function Price() {
                     onChange={(e) => setImageCount(Math.min(10000, Math.max(0, Number(e.target.value))))}
                     className={`
                       w-full px-4 py-3 rounded-lg border outline-none
-                      ${isDark 
-                        ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-500' 
+                      ${isDark
+                        ? 'bg-gray-800/50 border-gray-700 text-white placeholder-gray-400 focus:border-emerald-500'
                         : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-emerald-500'}
                     `}
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-6">
                 <div>
                   <label className={`block mb-2 font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -305,16 +281,16 @@ export default function Price() {
                       { value: 'advanced', label: '进阶模型', description: '更高精度，复杂场景适用' },
                       { value: 'enterprise', label: '企业模型', description: '最高精度，自定义训练' }
                     ].map((model) => (
-                      <label 
+                      <label
                         key={model.value}
                         className={`
                           flex items-center p-4 rounded-lg border cursor-pointer
-                          ${modelType === model.value 
-                            ? (isDark 
-                              ? 'border-emerald-500 bg-emerald-950/20' 
+                          ${modelType === model.value
+                            ? (isDark
+                              ? 'border-emerald-500 bg-emerald-950/20'
                               : 'border-emerald-500 bg-emerald-50')
-                            : (isDark 
-                              ? 'border-gray-700 hover:border-emerald-500/50' 
+                            : (isDark
+                              ? 'border-gray-700 hover:border-emerald-500/50'
                               : 'border-gray-300 hover:border-emerald-500/50')}
                         `}
                       >
@@ -338,11 +314,11 @@ export default function Price() {
                     ))}
                   </div>
                 </div>
-                
+
                 <div className={`
                   p-6 rounded-xl border
-                  ${isDark 
-                    ? 'border-emerald-500/50 bg-gray-900' 
+                  ${isDark
+                    ? 'border-emerald-500/50 bg-gray-900'
                     : 'border-emerald-500/50 bg-emerald-50'}
                 `}>
                   <h3 className={`text-xl font-bold mb-4 text-center ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>
@@ -356,7 +332,7 @@ export default function Price() {
                       /月
                     </div>
                   </div>
-                  
+
                   <div className="mt-6 space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>邮件处理:</span>
@@ -390,11 +366,11 @@ export default function Price() {
                     </div>
                   </div>
                 </div>
-                
+
                 <button className={`
                   w-full py-4 rounded-xl font-bold text-lg transition-colors
-                  ${isDark 
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white' 
+                  ${isDark
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white'
                     : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white'}
                 `}>
                   立即购买
@@ -404,7 +380,7 @@ export default function Price() {
           </div>
         </section>
       </div>
-      
+
       {/* 页脚 */}
       <footer className={`
         py-12 mt-20 text-center border-t border-emerald-900/50

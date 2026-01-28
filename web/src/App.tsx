@@ -3,6 +3,7 @@ import Home from "@/pages/Home";
 import Docs from "@/pages/Docs";
 import Price from "@/pages/Price";
 import Layout from "@/pages/Layout";
+import System from "@/pages/System";
 import Dash from "@/views/dash";
 import Workbench from "@/views/workbench";
 import Saijia from "@/views/saijia";
@@ -26,19 +27,34 @@ export default function App() {
           value={{ isAuthenticated, setIsAuthenticated, logout }}
         >
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/price" element={<Price />} />
-            <Route path="/docspage" element={<Docs />} />
+            <Route path="/" element={<Layout /> }>
+              <Route index element={<Home />} />
+              <Route path="docs" element={<Docs />} />
+              <Route path="price" element={<Price />} />
+            </Route>
             
-            <Route path="/dashboard" element={<Layout><Dash /></Layout>} />
-            <Route path="/workbench" element={<Layout><Workbench /></Layout>} />
-            <Route path="/saijia" element={<Layout><Saijia /></Layout>} />
-            <Route path="/dataset" element={<Layout><div className="text-center text-xl">Dataset View - Coming Soon</div></Layout>} />
-            <Route path="/experiment" element={<Layout><div className="text-center text-xl">Experiment View - Coming Soon</div></Layout>} />
-            <Route path="/chart" element={<Layout><div className="text-center text-xl">Chart View - Coming Soon</div></Layout>} />
-            <Route path="/grid" element={<Layout><div className="text-center text-xl">Grid View - Coming Soon</div></Layout>} />
-            <Route path="/layout" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/system" element={<System /> }>
+              <Route path="dashboard" element={<Dash />} />
+              <Route path="workbench" element={<Workbench />} />
+              <Route path="saijia" element={<Saijia />} />
+              <Route path="dataset" element={<div className="text-center text-xl">Dataset View - Coming Soon</div>} />
+              <Route path="experiment" element={<div className="text-center text-xl">Experiment View - Coming Soon</div>} />
+              <Route path="chart" element={<div className="text-center text-xl">Chart View - Coming Soon</div>} />
+              <Route path="grid" element={<div className="text-center text-xl">Grid View - Coming Soon</div>} />
+            </Route>
+            
+            <Route path="/dashboard" element={<Navigate to="/system/dashboard" replace />} />
+            <Route path="/workbench" element={<Navigate to="/system/workbench" replace />} />
+            <Route path="/saijia" element={<Navigate to="/system/saijia" replace />} />
+            <Route path="/dataset" element={<Navigate to="/system/dataset" replace />} />
+            <Route path="/experiment" element={<Navigate to="/system/experiment" replace />} />
+            <Route path="/chart" element={<Navigate to="/system/chart" replace />} />
+            <Route path="/grid" element={<Navigate to="/system/grid" replace />} />
+            
+            <Route path="/layout" element={<Navigate to="/system/dashboard" replace />} />
             <Route path="/other" element={<div className="text-center text-xl">Other Page - Coming Soon</div>} />
+            
+            <Route path="/*" element={<Navigate to="/" replace />} />
           </Routes>
         </AuthContext.Provider>
       </I18nProvider>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useThemeContext } from '@/contexts/themeContext';
 import { useI18nContext } from '@/contexts/i18nContext';
@@ -8,6 +8,8 @@ export default function Docs() {
   const { t } = useI18nContext();
 
   const [activeSection, setActiveSection] = useState('');
+
+  const scrollTimeoutRef = useRef(null);
 
   // 文档目录结构
   const docSections = [
@@ -65,65 +67,74 @@ export default function Docs() {
   // 监听滚动事件，高亮当前活跃的章节
   useEffect(() => {
     const handleScroll = () => {
-      const sections = document.querySelectorAll('[data-section]');
-      let current = '';
+      // 如果正在进行手动滚动，忽略滚动事件
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
 
-      sections.forEach(section => {
-        const sectionTop = section.getBoundingClientRect().top;
-        if (window.scrollY >= sectionTop - 200) {
-          current = section.getAttribute('id') || '';
-        }
-      });
+      // 设置一个短暂延迟来更新 activeSection，以避免频繁更新
+      scrollTimeoutRef.current = setTimeout(() => {
+        const sections = document.querySelectorAll('[data-section]');
+        let current = '';
 
-      setActiveSection(current);
+        sections.forEach(section => {
+          const sectionTop = section.getBoundingClientRect().top;
+          // 调整偏移量，更精确地判断当前激活的章节
+          if (window.scrollY >= section.offsetTop - 50) {
+            current = section.getAttribute('id') || '';
+          }
+        });
+
+        setActiveSection(current);
+      }, 100); // 100ms 防抖延迟
     };
 
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
   }, []);
 
   // 平滑滚动到指定元素
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      // 在滚动前先设置激活的章节
+      setActiveSection(id);
+
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+
+      // 滚动完成后再次确认激活的章节
+      setTimeout(() => {
+        setActiveSection(id);
+      }, 500); // 500ms 是大致的滚动完成时间
     }
   };
 
   return (
     <div className={`
       min-h-screen
-      ${isDark 
-        ? 'bg-gradient-to-b from-gray-950 via-gray-900 to-black text-gray-100' 
+      ${isDark
+        ? 'bg-gradient-to-b from-gray-950 via-gray-900 to-black text-gray-100'
         : 'bg-gradient-to-b from-gray-50 to-gray-200 text-gray-900'}
       font-sans antialiased
     `}>
-     {/* 导航栏 */}
-      <nav className={`
-        w-1/2 fixed top-6 left-1/2 transform -translate-x-1/2 z-50
-        ${isDark 
-          ? 'bg-gray-900/70 backdrop-blur-md' 
-          : 'bg-white/80 backdrop-blur-md'}
-        rounded-2xl px-6 py-4 shadow-lg
-      `}>
-        <div className="flex items-center justify-between space-x-6 pl-12">
-          <div className="py-2 hidden md:flex space-x-10">
-            <a href="/" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>首页</a>
-            <a href="/price" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>价格</a>
-            <a href="/docspage" className={`hover:text-emerald-400 transition-colors ${isDark ? 'text-emerald-400' : 'text-emerald-700 font-bold'}`}>文档</a>
-          </div>
-        </div>
-      </nav>
 
 
       <div className="pt-40 container mx-auto px-6 py-12">
         <div className="flex">
           {/* 左侧浮动导航栏 */}
-          <div 
+          <div
             className={`
               fixed left-6 top-24 bottom-24 w-64 overflow-y-auto z-40
-              ${isDark 
-                ? 'bg-gray-900/50 backdrop-blur-md shadow-lg rounded-xl p-4 opacity-90' 
+              ${isDark
+                ? 'bg-gray-900/50 backdrop-blur-md shadow-lg rounded-xl p-4 opacity-90'
                 : 'bg-white/50 backdrop-blur-md shadow-lg rounded-xl p-4 opacity-90'}
             `}
           >
@@ -135,8 +146,8 @@ export default function Docs() {
                     onClick={() => scrollToSection(section.id)}
                     className={`
                       w-full text-left py-2 px-3 rounded-lg transition-colors
-                      ${activeSection === section.id 
-                        ? (isDark ? 'bg-emerald-900/50 text-emerald-300' : 'bg-emerald-100 text-emerald-800') 
+                      ${activeSection === section.id
+                        ? (isDark ? 'bg-emerald-900/50 text-emerald-300' : 'bg-emerald-100 text-emerald-800')
                         : (isDark ? 'hover:bg-gray-800/50 text-gray-300' : 'hover:bg-gray-100 text-gray-700')}
                     `}
                   >
@@ -155,8 +166,8 @@ export default function Docs() {
                             onClick={() => scrollToSection(child.id)}
                             className={`
                               w-full text-left py-1.5 px-3 rounded-lg transition-colors
-                              ${activeSection === child.id 
-                                ? (isDark ? 'bg-emerald-900/30 text-emerald-200' : 'bg-emerald-100 text-emerald-700') 
+                              ${activeSection === child.id
+                                ? (isDark ? 'bg-emerald-900/30 text-emerald-200' : 'bg-emerald-100 text-emerald-700')
                                 : (isDark ? 'hover:bg-gray-800/30 text-gray-400' : 'hover:bg-gray-100 text-gray-600')}
                               text-xs
                             `}
@@ -186,7 +197,7 @@ export default function Docs() {
             {/* 介绍部分 */}
             <section data-section id="introduction" className="mb-16">
               <h2 className="text-3xl font-bold mb-6 text-emerald-500">介绍</h2>
-              
+
               <div data-section id="overview" className="mb-10">
                 <h3 className="text-2xl font-semibold mb-4">概述</h3>
                 <p className={`mb-4 leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -196,7 +207,7 @@ export default function Docs() {
                   该平台采用了最新的机器学习算法和深度学习模型，能够适应不同行业的数据处理需求，为企业提供智能化的数据解决方案。
                 </p>
               </div>
-              
+
               <div data-section id="features" className="mb-10">
                 <h3 className="text-2xl font-semibold mb-4">特性</h3>
                 <ul className={`space-y-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -222,7 +233,7 @@ export default function Docs() {
                   </li>
                 </ul>
               </div>
-              
+
               <div data-section id="architecture" className="mb-10">
                 <h3 className="text-2xl font-semibold mb-4">架构</h3>
                 <p className={`mb-4 leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -241,7 +252,7 @@ export default function Docs() {
             {/* 快速开始部分 */}
             <section data-section id="getting-started" className="mb-16">
               <h2 className="text-3xl font-bold mb-6 text-emerald-500">快速开始</h2>
-              
+
               <div data-section id="installation" className="mb-10">
                 <h3 className="text-2xl font-semibold mb-4">安装</h3>
                 <p className={`mb-4 leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -249,20 +260,20 @@ export default function Docs() {
                 </p>
                 <pre className={`
                   p-4 rounded-lg overflow-x-auto mb-4
-                  ${isDark 
-                    ? 'bg-gray-900 text-emerald-400 border border-emerald-500/30' 
+                  ${isDark
+                    ? 'bg-gray-900 text-emerald-400 border border-emerald-500/30'
                     : 'bg-gray-100 text-emerald-700 border border-emerald-200'}
                 `}>
                   <code>
                     # 安装SDK<br />
                     npm install @data-ai-engine/parser-sdk<br /><br />
-                    
+
                     # 或使用CDN<br />
                     &lt;script src="https://cdn.dataai.example.com/parser-sdk.js"&gt;&lt;/script&gt;
                   </code>
                 </pre>
               </div>
-              
+
               <div data-section id="configuration" className="mb-10">
                 <h3 className="text-2xl font-semibold mb-4">配置</h3>
                 <p className={`mb-4 leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -270,8 +281,8 @@ export default function Docs() {
                 </p>
                 <pre className={`
                   p-4 rounded-lg overflow-x-auto mb-4
-                  ${isDark 
-                    ? 'bg-gray-900 text-emerald-400 border border-emerald-500/30' 
+                  ${isDark
+                    ? 'bg-gray-900 text-emerald-400 border border-emerald-500/30'
                     : 'bg-gray-100 text-emerald-700 border border-emerald-200'}
                 `}>
                   <code>
@@ -285,7 +296,7 @@ export default function Docs() {
                   </code>
                 </pre>
               </div>
-              
+
               <div data-section id="first-steps" className="mb-10">
                 <h3 className="text-2xl font-semibold mb-4">第一步</h3>
                 <p className={`mb-4 leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -293,8 +304,8 @@ export default function Docs() {
                 </p>
                 <pre className={`
                   p-4 rounded-lg overflow-x-auto mb-4
-                  ${isDark 
-                    ? 'bg-gray-900 text-emerald-400 border border-emerald-500/30' 
+                  ${isDark
+                    ? 'bg-gray-900 text-emerald-400 border border-emerald-500/30'
                     : 'bg-gray-100 text-emerald-700 border border-emerald-200'}
                 `}>
                   <code>
@@ -329,13 +340,13 @@ console.log(result);
             {/* API参考部分 */}
             <section data-section id="api-reference" className="mb-16">
               <h2 className="text-3xl font-bold mb-6 text-emerald-500">API参考</h2>
-              
+
               <div data-section id="data-parser" className="mb-10">
                 <h3 className="text-2xl font-semibold mb-4">数据解析器</h3>
                 <p className={`mb-4 leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                   DataParser类是主要的解析接口，提供以下方法：
                 </p>
-                
+
                 <div className={`mb-6 p-4 rounded-lg ${isDark ? 'bg-gray-900' : 'bg-gray-100'}`}>
                   <h4 className="font-bold text-lg mb-2">parseDocument(options)</h4>
                   <p className={`mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -351,7 +362,7 @@ console.log(result);
                     <p className="mt-2"><strong>返回:</strong> Promise&lt;ParseResult&gt;</p>
                   </div>
                 </div>
-                
+
                 <div className={`mb-6 p-4 rounded-lg ${isDark ? 'bg-gray-900' : 'bg-gray-100'}`}>
                   <h4 className="font-bold text-lg mb-2">parseImage(options)</h4>
                   <p className={`mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -367,13 +378,13 @@ console.log(result);
                   </div>
                 </div>
               </div>
-              
+
               <div data-section id="extractor" className="mb-10">
                 <h3 className="text-2xl font-semibold mb-4">数据提取器</h3>
                 <p className={`mb-4 leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                   数据提取器提供专门的数据提取功能：
                 </p>
-                
+
                 <div className={`mb-6 p-4 rounded-lg ${isDark ? 'bg-gray-900' : 'bg-gray-100'}`}>
                   <h4 className="font-bold text-lg mb-2">extractStructuredData(data, schema)</h4>
                   <p className={`mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -394,7 +405,7 @@ console.log(result);
             {/* 示例部分 */}
             <section data-section id="examples" className="mb-16">
               <h2 className="text-3xl font-bold mb-6 text-emerald-500">示例</h2>
-              
+
               <div data-section id="pdf-parsing" className="mb-10">
                 <h3 className="text-2xl font-semibold mb-4">PDF解析示例</h3>
                 <p className={`mb-4 leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -402,8 +413,8 @@ console.log(result);
                 </p>
                 <pre className={`
                   p-4 rounded-lg overflow-x-auto mb-4
-                  ${isDark 
-                    ? 'bg-gray-900 text-emerald-400 border border-emerald-500/30' 
+                  ${isDark
+                    ? 'bg-gray-900 text-emerald-400 border border-emerald-500/30'
                     : 'bg-gray-100 text-emerald-700 border border-emerald-200'}
                 `}>
                   <code>
@@ -428,7 +439,7 @@ console.log('解析结果:', result);
                   </code>
                 </pre>
               </div>
-              
+
               <div data-section id="image-recognition" className="mb-10">
                 <h3 className="text-2xl font-semibold mb-4">图像识别示例</h3>
                 <p className={`mb-4 leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -436,8 +447,8 @@ console.log('解析结果:', result);
                 </p>
                 <pre className={`
                   p-4 rounded-lg overflow-x-auto mb-4
-                  ${isDark 
-                    ? 'bg-gray-900 text-emerald-400 border border-emerald-500/30' 
+                  ${isDark
+                    ? 'bg-gray-900 text-emerald-400 border border-emerald-500/30'
                     : 'bg-gray-100 text-emerald-700 border border-emerald-200'}
                 `}>
                   <code>
@@ -464,7 +475,7 @@ console.log('提取金额:', amount);
             {/* 故障排除部分 */}
             <section data-section id="troubleshooting" className="mb-16">
               <h2 className="text-3xl font-bold mb-6 text-emerald-500">故障排除</h2>
-              
+
               <div data-section id="common-issues" className="mb-10">
                 <h3 className="text-2xl font-semibold mb-4">常见问题</h3>
                 <div className={`mb-6 p-4 rounded-lg ${isDark ? 'bg-gray-900' : 'bg-gray-100'}`}>
@@ -473,7 +484,7 @@ console.log('提取金额:', amount);
                     <strong>原因:</strong> 文档质量差或使用了不适合的模型类型
                   </p>
                   <p className={`mb-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                    <strong>解决方案:</strong> 
+                    <strong>解决方案:</strong>
                   </p>
                   <ul className={`list-disc pl-5 space-y-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                     <li>提高输入文档的分辨率</li>
@@ -481,14 +492,14 @@ console.log('提取金额:', amount);
                     <li>调整解析参数，如置信度阈值</li>
                   </ul>
                 </div>
-                
+
                 <div className={`mb-6 p-4 rounded-lg ${isDark ? 'bg-gray-900' : 'bg-gray-100'}`}>
                   <h4 className="font-bold mb-2">API请求超时</h4>
                   <p className={`mb-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                     <strong>原因:</strong> 网络连接问题或处理大型文档
                   </p>
                   <p className={`mb-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                    <strong>解决方案:</strong> 
+                    <strong>解决方案:</strong>
                   </p>
                   <ul className={`list-disc pl-5 space-y-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                     <li>检查网络连接</li>
@@ -497,7 +508,7 @@ console.log('提取金额:', amount);
                   </ul>
                 </div>
               </div>
-              
+
               <div data-section id="debugging" className="mb-10">
                 <h3 className="text-2xl font-semibold mb-4">调试技巧</h3>
                 <p className={`mb-4 leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -505,8 +516,8 @@ console.log('提取金额:', amount);
                 </p>
                 <pre className={`
                   p-4 rounded-lg overflow-x-auto mb-4
-                  ${isDark 
-                    ? 'bg-gray-900 text-emerald-400 border border-emerald-500/30' 
+                  ${isDark
+                    ? 'bg-gray-900 text-emerald-400 border border-emerald-500/30'
                     : 'bg-gray-100 text-emerald-700 border border-emerald-200'}
                 `}>
                   <code>
@@ -530,7 +541,7 @@ console.log('字段置信度:', result.fieldConfidence);
           </div>
         </div>
       </div>
-      
+
       {/* 页脚 */}
       <footer className={`
         py-12 mt-20 text-center border-t border-emerald-900/50
