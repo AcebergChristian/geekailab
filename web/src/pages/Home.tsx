@@ -70,7 +70,7 @@ export default function Home() {
               开始分析
             </a>
             <Link
-              to="/docs"
+              to="/docspage"
               className={`
                 px-12 py-6 font-bold text-lg rounded-xl border-2 transition-all
                 ${isDark
