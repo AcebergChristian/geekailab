@@ -450,9 +450,11 @@ class HtmlTableParser:
         soup = BeautifulSoup(table_html, "html.parser")
         tbody = soup.find("tbody")
         if not tbody:
-            return []
-
-        rows = tbody.find_all("tr")
+            # 如果没有tbody，直接查找table下的所有tr
+            rows = soup.find_all("tr")
+        else:
+            # 如果有tbody，则查找tbody下的tr
+            rows = tbody.find_all("tr")
         if not rows:
             return []
 

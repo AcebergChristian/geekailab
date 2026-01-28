@@ -144,20 +144,21 @@ def main_parse(html_content):
         start_time = time.time()
         # 1. 拆楼处理 - 获取第一层邮件内容
         cleaned_html = mail_processor.truncate_html_if_needed(html_content)
-        print('cleaned_html==========>', cleaned_html)
+        # print('cleaned_html==========>', cleaned_html)
+
         # 2. HTML解析 - 提取并打平表格为行列表（使用utils.cluster.py中的方法）
         parsed_tables = process_html_to_tables(cleaned_html)
-        print('parsed_tables==========>', parsed_tables)
+        # print('parsed_tables==========>', parsed_tables)
         
         # 3. 使用LLM进行聚类处理
         llm_process_result = json.loads(llm_process(parsed_tables)).get('tables', '')
-        print('llm_process_result==========>', llm_process_result)
+        # print('llm_process_result==========>', llm_process_result)
         # with open('llm_process_result_MSC.json', 'w', encoding='utf-8') as f:
         #     json.dump(llm_process_result, f, ensure_ascii=False, indent=2)
 
         # 4. 表格分类 - 识别价格、附加费、备注表格
         classified_sections = table_classifier.classify_tables(llm_process_result)
-        print('classified_sections==========>', classified_sections)
+        # print('classified_sections==========>', classified_sections)
         
         # 5. 执行LLM处理 - 直接批量处理表格数据，每批50行
         result = executor.execute_without_cartesian_check(classified_sections)
@@ -782,6 +783,11 @@ else:
     print(f"Error: 找不到包含 index.html 的前端构建目录")
     # 如果找不到前端文件，至少提供API服务
     print("仅启动API服务，无前端界面")
+
+
+
+
+
 
 
 if __name__ == "__main__":

@@ -911,7 +911,7 @@ const Workbench: React.FC = () => {
                       />
                       <label
                         htmlFor="file-upload-ocr"
-                        className={`relative cursor-pointer rounded-md font-medium ${isDark ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-500'} focus-within:outline-none focus-within:ring-2 focus-within:ring-emerald-500 focus-within:ring-offset-2`}
+                        className={`relative cursor-pointer rounded-md font-medium ${isDark ? 'text-blue-500 hover:text-blue-300' : 'text-blue-700 hover:text-blue-500'} focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2`}
                       >
                         <span>选择文件</span>
                       </label>
