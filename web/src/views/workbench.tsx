@@ -362,7 +362,7 @@ const Workbench: React.FC = () => {
         setIsParsing(false);
       }
     } 
-    else if (activeTab === 'rich_text') {
+    else if (activeTab === 'richText') {
       // 富文本标签页时的处理
       if (!richvalue.trim()) {
         alert(t('pleaseEnterRichText'));

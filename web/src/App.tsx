@@ -7,6 +7,7 @@ import System from "@/pages/System";
 import Dash from "@/views/dash";
 import Workbench from "@/views/workbench";
 import Saijia from "@/views/saijia";
+import Dataset from "@/views/dataset";
 
 import { useState } from "react";
 import { AuthContext } from '@/contexts/authContext';
@@ -37,7 +38,7 @@ export default function App() {
               <Route path="dashboard" element={<Dash />} />
               <Route path="workbench" element={<Workbench />} />
               <Route path="saijia" element={<Saijia />} />
-              <Route path="dataset" element={<div className="text-center text-xl">Dataset View - Coming Soon</div>} />
+              <Route path="dataset" element={<Dataset />} />
               <Route path="experiment" element={<div className="text-center text-xl">Experiment View - Coming Soon</div>} />
               <Route path="chart" element={<div className="text-center text-xl">Chart View - Coming Soon</div>} />
               <Route path="grid" element={<div className="text-center text-xl">Grid View - Coming Soon</div>} />
