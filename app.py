@@ -7,10 +7,15 @@
 from openai import AzureOpenAI
 from config import LLM_CONFIG
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import FileResponse, JSONResponse
+import tempfile
+from pathlib import Path
+import io
+
+
 # import sqlite3
 from typing import List, Optional
 import os
@@ -139,12 +144,14 @@ def main_parse(html_content):
         start_time = time.time()
         # 1. 拆楼处理 - 获取第一层邮件内容
         cleaned_html = mail_processor.truncate_html_if_needed(html_content)
-        
+        print('cleaned_html==========>', cleaned_html)
         # 2. HTML解析 - 提取并打平表格为行列表（使用utils.cluster.py中的方法）
         parsed_tables = process_html_to_tables(cleaned_html)
+        print('parsed_tables==========>', parsed_tables)
         
         # 3. 使用LLM进行聚类处理
         llm_process_result = json.loads(llm_process(parsed_tables)).get('tables', '')
+        print('llm_process_result==========>', llm_process_result)
         # with open('llm_process_result_MSC.json', 'w', encoding='utf-8') as f:
         #     json.dump(llm_process_result, f, ensure_ascii=False, indent=2)
 
@@ -532,75 +539,63 @@ async def parse_email_content_api(request: dict):
 
 
 # 接口 获取前端formData 传过来的文件 
-@app.route('/api/ocr', methods=['POST'])
-def ocr_upload():
+@app.post("/api/ocr")
+async def ocr_upload(file: UploadFile = File(...)):
     """
     处理前端上传的文件，使用OCR解析后获取HTML内容，然后传递给main_parse
     """
+    temp_file_path = None  # 初始化临时文件路径变量
+    
     try:
-        # 检查是否有文件被上传
-        if 'file' not in request.files:
-            return jsonify({'error': '没有文件被上传'}), 400
-        
-        file = request.files['file']
         
         # 检查文件名是否为空
-        if file.filename == '':
-            return jsonify({'error': '文件名为空'}), 400
+        if not file.filename:
+            return JSONResponse(content={'error': '文件名为空'}, status_code=400)
         
         # 检查文件类型
-        allowed_extensions = {'pdf', 'png', 'jpg', 'jpeg', 'bmp', 'tiff', 'webp'}
+        allowed_extensions = {'pdf', 'PDF', 'png', 'jpg', 'jpeg', 'bmp', 'tiff', 'webp'}
         if '.' not in file.filename or \
            file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
-            return jsonify({'error': f'不支持的文件格式，支持的格式: {allowed_extensions}'}), 400
+            return JSONResponse(content={'error': f'不支持的文件格式，支持的格式: {allowed_extensions}'}, status_code=400)
         
-        # 保存上传的文件到临时位置
-        import tempfile
-        import os
-        temp_dir = tempfile.mkdtemp()
-        temp_file_path = os.path.join(temp_dir, file.filename)
-        file.save(temp_file_path)
+        # 读取文件内容
+        content = await file.read()
         
         try:
             # 调用OCR解析方法获取HTML内容
             from utils.ocr import hehe_anylze
-            result = hehe_anylze(temp_file_path)
+            # 直接传入文件内容和文件名
+            hehe_result = hehe_anylze(content)
             
-            # 从返回的结果中提取HTML内容
-            # 假设返回结果中包含HTML内容的字段名为'html_content'或其他可能的字段名
-            html_content = (
-                result.get("result", {}).get("html_content", "") or
-                result.get("result", {}).get("html", "") or
-                result.get("result", {}).get("content", "") or
-                result.get("data", {}).get("html_content", "") or
-                result.get("data", {}).get("html", "") or
-                result.get("data", {}).get("content", "") or
-                ""
-            )
+            # 检查是否返回错误
+            if hehe_result.get("message", '') != 'Success':
+                return JSONResponse(content={'error': f'OCR解析错误: {hehe_result["error"]}'}, status_code=500)
             
-            if not html_content:
-                return jsonify({'error': 'OCR解析未返回HTML内容'}), 500
+            hehe_md = hehe_result.get("result", {}).get("markdown", {})
+            print('hehe_md', type(hehe_md))
+            # 调用main_parse函数进行解析
+            result, processing_time = main_parse(hehe_md)
             
-            # 调用main_parse函数处理HTML内容
-            from app import main_parse  # 导入main_parse函数
-            parsed_result = main_parse(html_content)
+            return {
+                "result": result,
+                "processing_time": processing_time,
+                "success": True
+            }
             
-            # 返回解析结果
-            return jsonify({
-                'success': True,
-                'html_content': html_content,
-                'parsed_result': parsed_result
-            })
-            
-        finally:
-            # 清理临时文件
-            import shutil
-            shutil.rmtree(temp_dir)
+        except Exception as ocr_error:
+            print(f"OCR解析过程中发生错误: {str(ocr_error)}")
+            return JSONResponse(content={'error': f'OCR解析过程中发生错误: {str(ocr_error)}'}, status_code=500)
     
     except Exception as e:
+        # 如果临时文件路径存在且文件存在，尝试删除它
+        if temp_file_path and os.path.exists(temp_file_path):
+            try:
+                os.unlink(temp_file_path)
+            except:
+                pass  # 忽略删除临时文件时的错误
+                
         print(f"OCR处理失败: {str(e)}")
-        return jsonify({'error': f'OCR处理失败: {str(e)}'}), 500
-
+        return JSONResponse(content={'error': f'OCR处理失败: {str(e)}'}, status_code=500)
 
 
 

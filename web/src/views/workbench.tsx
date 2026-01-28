@@ -143,7 +143,7 @@ const Workbench: React.FC = () => {
   const { language, toggleLanguage, t } = useI18nContext();
 
   // OCR相关状态
-  const [ocrFiles, setOcrFiles] = useState<File[]>([]);
+  const [ocrFiles, setOcrFiles] = useState<any>(null);
   const [ocrResults, setOcrResults] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
@@ -361,7 +361,8 @@ const Workbench: React.FC = () => {
       } finally {
         setIsParsing(false);
       }
-    } else {
+    } 
+    else if (activeTab === 'rich_text') {
       // 富文本标签页时的处理
       if (!richvalue.trim()) {
         alert(t('pleaseEnterRichText'));
@@ -410,6 +411,59 @@ const Workbench: React.FC = () => {
       } finally {
         setIsParsing(false);
       }
+    }
+    else if (activeTab === 'ocr') {
+      // OCR标签页时的处理
+      if (!ocrFiles) {
+        alert('请先上传文件');
+        return;
+      }
+
+      setIsParsing(true);
+
+      try {
+        // 创建 FormData 对象来发送文件
+        const formData = new FormData();
+        formData.append('file', ocrFiles);
+        console.log('formData', formData);
+
+        const response = await fetch('/api/ocr', {
+          method: 'POST',
+          // 注意：不要设置 Content-Type，让浏览器自动设置 multipart/form-data
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        setJsonResult(result);
+      } catch (error) {
+        console.error('OCR解析失败:', error);
+        // 使用模拟数据作为后备
+        const mockJsonResult = {
+          content_type: 'ocr_result',
+          content_summary: 'OCR解析结果摘要...',
+          entities: {
+            people: [],
+            organizations: [],
+            dates: [],
+            amounts: [],
+            locations: []
+          },
+          sentiment: 'neutral',
+          action_items: [],
+          processing_time: 0,
+          success: false,
+          original_filename: ocrFiles?.name || 'unknown'
+        };
+
+        setJsonResult(mockJsonResult);
+      } finally {
+        setIsParsing(false);
+      }
+
     }
   };
 
@@ -809,178 +863,168 @@ const Workbench: React.FC = () => {
             )}
 
             {activeTab === 'ocr' && (
-                <div className="flex flex-1 h-full">
-                  {/* 左侧上传面板 */}
-                  <div className={cn("w-1/3 border-r flex flex-col",
+              <div className="flex flex-1 h-full">
+                {/* 左侧上传面板 */}
+                <div className={cn("w-1/3 border-r flex flex-col",
+                  isDark
+                    ? "border-gray-700 bg-gray-800"
+                    : "border-gray-200 bg-white"
+                )}>
+                  <div className={cn("p-4 border-b",
                     isDark
-                      ? "border-gray-700 bg-gray-800"
-                      : "border-gray-200 bg-white"
+                      ? "border-gray-700 bg-gray-750"
+                      : "border-gray-200 bg-gray-50"
                   )}>
-                    <div className={cn("p-4 border-b",
-                      isDark
-                        ? "border-gray-700 bg-gray-750"
-                        : "border-gray-200 bg-gray-50"
-                    )}>
-                      <h3 className="font-medium">OCR 文档解析</h3>
-                    </div>
-                    <div className="flex-1 flex flex-col p-4">
-                      <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-8">
-                        <div className="text-center mb-6">
-                          <svg className={`mx-auto h-12 w-12 ${isDark ? 'text-gray-400' : 'text-gray-300'}`} stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                          <h3 className={`mt-2 text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>拖拽文件到此处或点击上传</h3>
-                          <p className={`mt-1 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>支持 JPG、PNG、PDF 等格式</p>
-                        </div>
-                        <input
-                          type="file"
-                          multiple
-                          accept=".jpg,.jpeg,.png,.pdf"
-                          className="hidden"
-                          id="file-upload-ocr"
-                          onChange={(e) => {
-                            if (e.target.files && e.target.files.length > 0) {
-                              const newFiles = Array.from(e.target.files);
-                              setOcrFiles(prev => [...prev, ...newFiles]);
-                              
-                              // 为每个新上传的文件创建预览
-                              newFiles.forEach(file => {
-                                if (file.type.startsWith('image/')) {
-                                  const reader = new FileReader();
-                                  reader.onload = (e) => {
-                                    // 可以在这里添加预览逻辑
-                                  };
-                                  reader.readAsDataURL(file);
-                                }
-                              });
-                            }
-                          }}
-                        />
-                        <label
-                          htmlFor="file-upload-ocr"
-                          className={`relative cursor-pointer rounded-md font-medium ${isDark ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-500'} focus-within:outline-none focus-within:ring-2 focus-within:ring-emerald-500 focus-within:ring-offset-2`}
-                        >
-                          <span>选择文件</span>
-                        </label>
-                      </div>
-                      
-                      {/* 已上传文件列表 */}
-                      <div className="mt-4">
-                        <h4 className={`text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>已上传文件</h4>
-                        <div className="space-y-2 max-h-40 overflow-y-auto">
-                          {ocrFiles.map((file, index) => (
-                            <div 
-                              key={index} 
-                              className={cn("flex items-center p-2 rounded border truncate",
-                                isDark
-                                  ? "bg-gray-750 border-gray-700 text-gray-300"
-                                  : "bg-gray-50 border-gray-200 text-gray-700"
-                              )}
-                            >
-                              <FileText size={16} className="mr-2 flex-shrink-0" />
-                              <span className="truncate">{file.name}</span>
-                              <span className="ml-auto text-xs opacity-70">{(file.size / 1024).toFixed(1)}KB</span>
-                            </div>
-                          ))}
-                        </div>
-                        
-                        <button
-                          disabled={isProcessing || ocrFiles.length === 0}
-                          onClick={async () => {
-                            if (ocrFiles.length === 0) return;
-                            
-                            setIsProcessing(true);
-                            try {
-                              const formData = new FormData();
-                              ocrFiles.forEach(file => {
-                                formData.append('file', file);
-                              });
-                              
-                              const response = await fetch('/api/ocr', {
-                                method: 'POST',
-                                body: formData
-                              });
-                              
-                              if (!response.ok) {
-                                throw new Error(`HTTP error! status: ${response.status}`);
-                              }
-                              
-                              const result = await response.json();
-                              if (result.success) {
-                                setOcrResults(result.html_content);
-                              } else {
-                                console.error('OCR处理失败:', result.error);
-                              }
-                            } catch (error) {
-                              console.error('上传失败:', error);
-                            } finally {
-                              setIsProcessing(false);
-                            }
-                          }}
-                          className={`
-                            mt-4 w-full py-2 px-4 rounded-md font-medium
-                            ${isProcessing 
-                              ? 'bg-gray-400 cursor-not-allowed' 
-                              : isDark 
-                                ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
-                                : 'bg-emerald-600 hover:bg-emerald-500 text-white'}
-                          `}
-                        >
-                          {isProcessing ? '处理中...' : '开始解析'}
-                        </button>
-                        
-                        <button
-                          onClick={() => {
-                            setOcrFiles([]);
-                            setOcrResults('');
-                          }}
-                          className={`
-                            mt-2 w-full py-2 px-4 rounded-md font-medium
-                            ${isDark 
-                              ? 'bg-gray-700 hover:bg-gray-600 text-white' 
-                              : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
-                          `}
-                        >
-                          清空
-                        </button>
-                      </div>
-                    </div>
+                    <h3 className="font-medium">OCR 文档解析</h3>
                   </div>
+                  <div className="flex-1 flex flex-col p-4">
+                    <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-8">
+                      <div className="text-center mb-6">
+                        <svg className={`mx-auto h-12 w-12 ${isDark ? 'text-gray-400' : 'text-gray-300'}`} stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        <h3 className={`mt-2 text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>拖拽文件到此处或点击上传</h3>
+                        <p className={`mt-1 text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>支持 JPG、PNG、PDF 等格式</p>
+                      </div>
+                      <input
+                        type="file"
+                        multiple
+                        accept=".jpg,.jpeg,.png,.pdf"
+                        className="hidden"
+                        id="file-upload-ocr"
+                        onChange={(e) => {
 
-                  {/* 右侧结果面板 */}
-                  <div className={cn("w-2/3 rounded-lg border shadow-sm overflow-hidden flex flex-col",
-                    isDark
-                      ? "bg-gray-800 border-gray-700"
-                      : "bg-white border-gray-200"
-                  )}>
-                    <div className={cn("p-4 border-b",
-                      isDark
-                        ? "border-gray-700 bg-gray-750"
-                        : "border-gray-200 bg-gray-50"
-                    )}>
-                      <h3 className="font-medium">解析结果</h3>
+                          if (e.target.files && e.target.files.length > 0) {
+                            const newFiles = e.target.files[0];
+                            setOcrFiles(newFiles as any);
+
+                            // 为每个新上传的文件创建预览
+                            if (newFiles.type.startsWith('image/')) {
+                              const reader = new FileReader();
+                              reader.onload = (e) => {
+                                // 可以在这里添加预览逻辑
+                              };
+                              reader.readAsDataURL(newFiles);
+                            }
+                          }
+                        }}
+                      />
+                      <label
+                        htmlFor="file-upload-ocr"
+                        className={`relative cursor-pointer rounded-md font-medium ${isDark ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-500'} focus-within:outline-none focus-within:ring-2 focus-within:ring-emerald-500 focus-within:ring-offset-2`}
+                      >
+                        <span>选择文件</span>
+                      </label>
                     </div>
-                    <div className="flex-1 overflow-y-auto p-4">
-                      {isProcessing ? (
-                        <div className="flex items-center justify-center h-full">
-                          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+
+                    {/* 已上传文件列表 */}
+                    <div className="mt-4">
+                      <h4 className={`text-sm font-medium mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>已上传文件</h4>
+
+
+                      {ocrFiles && <div className="space-y-2 max-h-40 overflow-y-auto">
+                        <div
+                          className={cn("flex items-center p-2 rounded border truncate",
+                            isDark
+                              ? "bg-gray-750 border-gray-700 text-gray-300"
+                              : "bg-gray-50 border-gray-200 text-gray-700"
+                          )}
+                        >
+                          <FileText size={16} className="mr-2 flex-shrink-0" />
+                          <span className="truncate">{ocrFiles?.name}</span>
+                          <span className="ml-auto text-xs opacity-70">{(ocrFiles?.size / 1024).toFixed(1)}KB</span>
                         </div>
-                      ) : ocrResults ? (
-                        <div 
-                          className={`prose max-w-none ${isDark ? 'prose-invert' : ''}`}
-                          dangerouslySetInnerHTML={{ __html: ocrResults }} 
-                        />
-                      ) : (
-                        <div className={cn("flex items-center justify-center h-full",
-                          isDark ? "text-gray-500" : "text-gray-400"
-                        )}>
-                          上传文件并点击解析后，结果将在此处显示...
-                        </div>
-                      )}
+                      </div>
+                      }
+
+
+
+                      <button
+                        onClick={() => {
+                          setOcrFiles(null);
+                          setOcrResults('');
+                        }}
+                        className={`
+                            mt-2 w-full py-2 px-4 rounded-md font-medium
+                            ${isDark
+                            ? 'bg-gray-700 hover:bg-gray-600 text-white'
+                            : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}
+                          `}
+                      >
+                        清空
+                      </button>
                     </div>
                   </div>
                 </div>
-              )}
+
+                {/* 右侧预览面板 */}
+                <div className={cn("w-2/3 rounded-lg border shadow-sm overflow-hidden flex flex-col",
+                  isDark
+                    ? "bg-gray-800 border-gray-700"
+                    : "bg-white border-gray-200"
+                )}>
+                  <div className={cn("p-4 border-b",
+                    isDark
+                      ? "border-gray-700 bg-gray-750"
+                      : "border-gray-200 bg-gray-50"
+                  )}>
+                    <h3 className="font-medium">预览</h3>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-4">
+                    {ocrFiles ? (
+                      <div className="h-full flex flex-col items-center justify-center">
+                        {ocrFiles && ocrFiles.type.startsWith('image/') ? (
+                          // 图片预览
+                          <img 
+                            src={URL.createObjectURL(ocrFiles)} 
+                            alt="Preview" 
+                            className="max-w-full max-h-full object-contain rounded border"
+                          />
+                        ) : ocrFiles.type === 'application/pdf' ? (
+                          // PDF预览，使用iframe标签
+                          <div className="w-full h-full">
+                            <iframe 
+                              src={URL.createObjectURL(ocrFiles)} 
+                              width="100%" 
+                              height="600px"
+                              className="rounded border"
+                              title="PDF预览"
+                            >
+                              <p className="text-center p-4">您的浏览器不支持PDF预览，请<a 
+                                href={URL.createObjectURL(ocrFiles)} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className={cn(
+                                  "px-4 py-2 rounded-md font-medium",
+                                  isDark 
+                                    ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                                )}
+                              >
+                                点击下载
+                              </a></p>
+                            </iframe>
+                          </div>
+                        ) : (
+                          // 其他文件类型的预览
+                          <div className="text-center">
+                            <FileText size={48} className="mx-auto mb-4 opacity-50" />
+                            <p>无法预览此文件类型</p>
+                            <p className="text-sm mt-2">{ocrFiles.name}</p>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className={cn("flex items-center justify-center h-full",
+                        isDark ? "text-gray-500" : "text-gray-400"
+                      )}>
+                        上传文件后将在此处显示预览...
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
 
