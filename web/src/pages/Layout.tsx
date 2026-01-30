@@ -2,7 +2,7 @@ import { useThemeContext } from '@/contexts/themeContext';
 import React, { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useI18nContext } from '@/contexts/i18nContext';
-import { Sun, Moon, Menu, X } from 'lucide-react';
+import { Sun, Moon, Menu, X, Globe } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ContactModal from '@/components/ContactModal';
 
@@ -28,12 +28,13 @@ const Layout: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+    <div className={` min-h-screen ${isDark ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
 
       {/* 导航栏 */}
-      <nav className={`sticky top-0 z-50 backdrop-blur-md ${isDark ? 'bg-black/70 border-gray-800' : 'bg-white/70 border-gray-200'} border-b`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+      <nav className={` left-[10%] sticky top-4 w-[80%] z-50 h-20 flex items-center rounded-lg backdrop-blur-md ${isDark ? 'bg-black/70 border-gray-800' : 'bg-white/70 border-gray-200'} shadow-md`}>
+        <div className="max-w-8xl w-full sm:px-6 lg:px-8">
+          
+          <div className="flex justify-between items-center w-full h-16">
             <div className="flex items-center">
               <div 
                 className={`text-2xl font-bold flex items-center ${isDark ? 'text-purple-400' : 'text-emerald-600'}`}
@@ -45,8 +46,10 @@ const Layout: React.FC = () => {
               </div>
             </div>
             
+
+            <div className="flex justify-between items-center  min-w-[60%]">
             {/* Desktop Navigation */}
-            <div className="hidden md:flex space-x-8">
+            <div className="hidden md:flex space-x-12">
               <a href="/" className={`hover:text-emerald-400 transition-colors ${isActive('/') ? (isDark ? 'text-emerald-400 font-bold' : 'text-emerald-700 font-bold') : (isDark ? 'text-gray-300' : 'text-gray-700')}`}>{t('home')}</a>
               <a href="/price" className={`hover:text-emerald-400 transition-colors ${isActive('/price') ? (isDark ? 'text-emerald-400 font-bold' : 'text-emerald-700 font-bold') : (isDark ? 'text-gray-300' : 'text-gray-700')}`}>{t('pricing')}</a>
               <a href="/docspage" className={`hover:text-emerald-400 transition-colors ${isActive('/docspage') ? (isDark ? 'text-emerald-400 font-bold' : 'text-emerald-700 font-bold') : (isDark ? 'text-gray-300' : 'text-gray-700')}`}>{t('docs')}</a>
@@ -55,25 +58,19 @@ const Layout: React.FC = () => {
             {/* Theme and Language Switch + CTA Buttons */}
             <div className="hidden md:flex items-center space-x-4">
               {/* Language switch */}
-              <div className="relative">
-                <select 
-                  value={language}
-                  onChange={(e) => toggleLanguage()}
-                  className={`appearance-none py-1.5 pl-3 pr-8 rounded-md ${
+              <button 
+                  onClick={toggleLanguage}
+                  className={`rounded-full 
+                    w-12 h-12 
+                    ${
                     isDark 
-                      ? 'bg-gray-800 text-gray-200 border border-gray-700' 
-                      : 'bg-white text-gray-800 border border-gray-300'
-                  } focus:outline-none focus:ring-2 ${isDark ? 'focus:ring-purple-500' : 'focus:ring-emerald-500'}`}
+                      ? 'bg-gray-800 text-yellow-300' 
+                      : 'bg-gray-100 text-gray-700'
+                  }`}
+                  aria-label={language === 'zh' ? "Switch to English" : "Switch to Chinese"}
                 >
-                  <option value="zh">中文</option>
-                  <option value="en">English</option>
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </div>
-              </div>
+                  <span className="text-sm">{language === 'zh' ? '中文' : 'EN'}</span>
+                </button>
               
               {/* Theme switch */}
               <button 
@@ -87,15 +84,12 @@ const Layout: React.FC = () => {
               >
                 {isDark ? <Sun size={20} /> : <Moon size={20} />}
               </button>
-              
-               <button className={`${isDark ? 'text-purple-400 hover:text-purple-300' : 'text-emerald-600 hover:text-emerald-700'} font-medium`} onClick={() => setShowLoginModal(true)}>
-                 {t('登录')}
-               </button>
                <button className={`font-medium py-2 px-4 rounded-md transition-colors ${
                  isDark 
                    ? 'bg-purple-500 hover:bg-purple-600 text-white' 
                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-               } mr-3`}>
+               } mr-3`}
+               onClick={() => setShowLoginModal(true)}>
                  {t('tryNow')}
                </button>
                <button 
@@ -108,6 +102,8 @@ const Layout: React.FC = () => {
                >
                  {t('联系我们')}
                </button>
+            </div>
+
             </div>
             
             {/* Mobile menu button */}

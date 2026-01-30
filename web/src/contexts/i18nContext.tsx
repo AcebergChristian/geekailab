@@ -191,7 +191,7 @@ const translations: Translations = {
     '博客': 'Blog',
     '案例研究': 'Case Studies',
     '关于我们': 'About Us',
-    '联系我们': 'Contact Us',
+    '联系我们': 'Contact',
     '加入我们': 'Join Us',
     '隐私政策': 'Privacy Policy',
     '服务条款': 'Terms of Service',
