@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart3, Building, User, ArrowRight, CheckCircle, DollarSign } from 'lucide-react';
-import { useTheme } from '@/hooks/useTheme';
+import { useThemeContext } from '@/contexts/themeContext';
 import { toast } from 'sonner';
 
 interface CostCalculatorProps {
@@ -9,7 +9,7 @@ interface CostCalculatorProps {
 }
 
 const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
-  const { isDark } = useTheme();
+  const { isDark } = useThemeContext();
   const [calculatorType, setCalculatorType] = useState<'personal' | 'enterprise'>('personal');
   
   // 个人用户计算器状态
@@ -266,7 +266,7 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
                     }`}
                   />
                 </div>
-                <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>例如: 200封</p>
+                {/* <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>例如: 200封</p> */}
               </div>
               
               {/* 每封邮件平均包含运价条数 */}
@@ -285,7 +285,7 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
                       : 'bg-white border-gray-300 text-gray-900'
                   }`}
                 />
-                <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>例如: 8条</p>
+                {/* <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>例如: 8条</p> */}
               </div>
               
               {/* 使用频率 */}

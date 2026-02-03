@@ -562,10 +562,6 @@ const Workbench: React.FC = () => {
     }, 1500)
   }, [])
 
-  // 工具栏配置
-  const toolbarConfig: Partial<IToolbarConfig> = {
-
-  }
 
   // 编辑器配置
   const editorConfig: Partial<IEditorConfig> = {
@@ -644,7 +640,7 @@ const Workbench: React.FC = () => {
                 }`}
               onClick={() => setActiveTab('ocr')}
             >
-              OCR
+              {t('OCR')}
             </button>
           </div>
         </div>

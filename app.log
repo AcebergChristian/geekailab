@@ -115,3 +115,14 @@
 2026-01-28 15:28:29,211 - INFO - Retrying request to /chat/completions in 0.445305 seconds
 2026-01-28 15:28:34,452 - INFO - HTTP Request: POST https://prime-02.openai.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-04-01-preview "HTTP/1.1 200 OK"
 2026-01-28 15:28:37,859 - INFO - HTTP Request: POST https://prime-02.openai.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-04-01-preview "HTTP/1.1 200 OK"
+2026-01-31 15:52:56,319 - INFO - 开始处理邮件数据...
+2026-01-31 15:53:00,984 - INFO - HTTP Request: POST https://prime-02.openai.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-04-01-preview "HTTP/1.1 200 OK"
+2026-01-31 15:53:08,064 - INFO - HTTP Request: POST https://prime-02.openai.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-04-01-preview "HTTP/1.1 200 OK"
+2026-02-03 16:59:16,467 - INFO - 开始处理邮件数据...
+2026-02-03 16:59:26,607 - INFO - HTTP Request: POST https://prime-02.openai.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-04-01-preview "HTTP/1.1 200 OK"
+2026-02-03 17:00:03,908 - INFO - Retrying request to /chat/completions in 0.488756 seconds
+2026-02-03 17:00:11,460 - INFO - HTTP Request: POST https://prime-02.openai.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-04-01-preview "HTTP/1.1 200 OK"
+2026-02-03 17:00:24,764 - INFO - HTTP Request: POST https://prime-02.openai.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-04-01-preview "HTTP/1.1 200 OK"
+2026-02-03 17:02:52,570 - INFO - 开始处理邮件数据...
+2026-02-03 17:02:58,679 - INFO - HTTP Request: POST https://prime-02.openai.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-04-01-preview "HTTP/1.1 200 OK"
+2026-02-03 17:03:34,996 - INFO - HTTP Request: POST https://prime-02.openai.azure.com/openai/deployments/gpt-4.1/chat/completions?api-version=2025-04-01-preview "HTTP/1.1 200 OK"

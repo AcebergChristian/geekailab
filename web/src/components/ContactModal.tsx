@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle } from 'lucide-react';
-import { useTheme } from '@/hooks/useTheme';
+import { useThemeContext } from '@/contexts/themeContext';
 import { toast } from 'sonner';
 
 interface ContactModalProps {
@@ -22,7 +22,7 @@ interface FormData {
 }
 
 const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
-  const { isDark } = useTheme();
+  const { isDark } = useThemeContext();
   
   const [formData, setFormData] = useState<FormData>({
     name: '',

@@ -86,6 +86,8 @@ const translations: Translations = {
     supplyChainOptimization: 'Supply Chain Optimization',
     // 新增富文本相关词条
     richTextField: 'Rich Text',
+    richText: 'Text',
+    OCR: 'File',
     inputRichText: 'Input Rich Text',
     enterRichTextPlaceholder: 'Enter your rich text here...',
     submitting: 'Submitting',
@@ -272,6 +274,8 @@ const translations: Translations = {
     supplyChainOptimization: '供应链优化',
     // 新增富文本相关词条
     richTextField: '富文本',
+    richText: '文本',
+    OCR: '文件',
     inputRichText: '输入富文本',
     enterRichTextPlaceholder: '在此输入您的富文本内容...',
     submitting: '提交中',
