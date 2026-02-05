@@ -6,6 +6,7 @@ import ContactModal from '@/components/ContactModal';
 import { useI18nContext } from '@/contexts/i18nContext';
 import { useThemeContext } from '@/contexts/themeContext';
 import { X } from 'lucide-react';
+import ailabbg from '@/assets/ailabbg.png'
 
 
 
@@ -104,7 +105,7 @@ const Home: React.FC = () => {
   const [contactModalOpen, setContactModalOpen] = useState(false);
 
 
-  const { language, toggleLanguage, t } = useI18nContext();
+  const { t } = useI18nContext();
 
     // 视频弹窗状态
 const [isOpen, setIsOpen] = useState(false);
@@ -220,6 +221,33 @@ const onClose = () => {
 
 
 
+
+{/* Video Section */}
+      <section className="relative w-full h-screen overflow-hidden">
+        {/* Background Video */}
+        {/* <video
+          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay
+          muted
+          loop
+          playsInline
+        >
+          <source src="https://geekfiles.oss-cn-shanghai.aliyuncs.com/rms/6f759fa6c95d470a9314f52a7f01c2b9.mp4" type="video/mp4" />
+        </video> */}
+        
+        <img
+          className="absolute inset-0 w-full h-full object-cover"
+          src="https://media.istockphoto.com/id/2120176755/zh/%E7%85%A7%E7%89%87/men-who-use-websites-or-ai-software-technology-to-help-and-support-tasks-for-chatbots-ai-chat.jpg?s=2048x2048&w=is&k=20&c=jvXXWzMv6iaiTNimKAfgHVZ6Zhdl63XbiyfZsY-k97g=" 
+          alt="" />
+        
+        {/* Background Image Overlay */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60"
+          style={{
+            backgroundImage: `url(${ailabbg})`
+          }}
+        ></div>
+      </section>
 
 
 
@@ -579,7 +607,7 @@ const onClose = () => {
               } rounded-xl  ${isDark ? 'border-gray-800' : 'border-gray-200'
               }`}>
               {/* Animation keyframes */}
-              <style jsx>{`
+              <style>{`
                 @keyframes scroll {
                   0% { transform: translateX(0); }
                   100% { transform: translateX(-50%); }
@@ -650,7 +678,7 @@ const onClose = () => {
       
 
       {/* Add global styles for AI lab patterns */}
-      <style jsx global>{`
+      <style>{`
         .bg-grid-pattern-dark {
           background-image: 
             linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),

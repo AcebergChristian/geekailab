@@ -48,7 +48,7 @@ const Layout: React.FC = () => {
                 <div className={`h-8 w-8 rounded-full flex items-center justify-center mr-2 ${isDark ? 'bg-gradient-to-r from-purple-500 to-indigo-600' : 'bg-gradient-to-r from-emerald-500 to-teal-600'}`}>
                   <span className="font-bold text-white">G</span>
                 </div>
-                <span>Geek AI LAB</span>
+                <span>iMail Rates</span>
               </div>
             </div>
 
@@ -377,13 +377,13 @@ const Layout: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div>
-              <div className={`text-2xl font-bold flex items-center mb-6 ${isDark ? 'text-purple-400' : 'text-emerald-600'
+              <div className={`text-2xl font-bold flex items-center mb-6 ${isDark ? 'text-purple-400' : 'text-emerald-300'
                 }`}>
                 <div className={`h-8 w-8 rounded-full flex items-center justify-center mr-2 ${isDark ? 'bg-gradient-to-r from-purple-500 to-indigo-600' : 'bg-gradient-to-r from-emerald-500 to-teal-600'
                   }`}>
                   <span className="font-bold">AI</span>
                 </div>
-                <span>FreightParse</span>
+                <span>iMail Rates</span>
               </div>
               <p className={`mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'
                 }`}>
