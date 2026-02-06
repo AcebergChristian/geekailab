@@ -6,7 +6,7 @@ import ContactModal from '@/components/ContactModal';
 import { useI18nContext } from '@/contexts/i18nContext';
 import { useThemeContext } from '@/contexts/themeContext';
 import { X } from 'lucide-react';
-import ailabbg from '@/assets/ailabbg.png'
+import DotMatrixText from '@/components/DotMatrixText';
 
 
 
@@ -107,21 +107,21 @@ const Home: React.FC = () => {
 
   const { t } = useI18nContext();
 
-    // 视频弹窗状态
-const [isOpen, setIsOpen] = useState(false);
-const [videoUrl, setVideoUrl] = useState<string>('');
+  // 视频弹窗状态
+  const [isOpen, setIsOpen] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string>('');
 
-// 打开视频（这里直接用你给的固定 URL）
-const openVideo = () => {
-  setVideoUrl('https://geekfiles.oss-cn-shanghai.aliyuncs.com/rms/6f759fa6c95d470a9314f52a7f01c2b9.mp4');
-  setIsOpen(true);
-};
+  // 打开视频（这里直接用你给的固定 URL）
+  const openVideo = () => {
+    setVideoUrl('https://geekfiles.oss-cn-shanghai.aliyuncs.com/rms/6f759fa6c95d470a9314f52a7f01c2b9.mp4');
+    setIsOpen(true);
+  };
 
-// 关闭视频
-const onClose = () => {
-  setIsOpen(false);
-  setVideoUrl('');
-};
+  // 关闭视频
+  const onClose = () => {
+    setIsOpen(false);
+    setVideoUrl('');
+  };
 
   // Features data
   const features = [
@@ -222,31 +222,10 @@ const onClose = () => {
 
 
 
-{/* Video Section */}
-      <section className="relative w-full h-screen overflow-hidden">
-        {/* Background Video */}
-        {/* <video
-          className="absolute inset-0 w-full h-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-        >
-          <source src="https://geekfiles.oss-cn-shanghai.aliyuncs.com/rms/6f759fa6c95d470a9314f52a7f01c2b9.mp4" type="video/mp4" />
-        </video> */}
-        
-        <img
-          className="absolute inset-0 w-full h-full object-cover"
-          src="https://media.istockphoto.com/id/2120176755/zh/%E7%85%A7%E7%89%87/men-who-use-websites-or-ai-software-technology-to-help-and-support-tasks-for-chatbots-ai-chat.jpg?s=2048x2048&w=is&k=20&c=jvXXWzMv6iaiTNimKAfgHVZ6Zhdl63XbiyfZsY-k97g=" 
-          alt="" />
-        
-        {/* Background Image Overlay */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60"
-          style={{
-            backgroundImage: `url(${ailabbg})`
-          }}
-        ></div>
+      {/* home welcome Section */}
+      <section className={`relative w-full h-[360px] overflow-hidden flex items-center justify-center ${isDark ? 'bg-gray-900' : 'bg-gray-50'
+        }`}>
+        <DotMatrixText />
       </section>
 
 
@@ -256,8 +235,8 @@ const onClose = () => {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <div className={`absolute inset-0 ${isDark
-              ? 'bg-gradient-to-r from-purple-900/30 to-indigo-900/30'
-              : 'bg-gradient-to-r from-emerald-100/50 to-teal-100/50'
+            ? 'bg-gradient-to-r from-purple-900/30 to-indigo-900/30'
+            : 'bg-gradient-to-r from-emerald-100/50 to-teal-100/50'
             }`}></div>
           <div className="absolute top-0 left-0 w-full h-full opacity-10">
             {isDark ? (
@@ -276,8 +255,8 @@ const onClose = () => {
           {/* Grid background for AI lab feel */}
           <div className="absolute inset-0 opacity-10">
             <div className={`h-full w-full grid grid-cols-12 gap-4 ${isDark
-                ? 'bg-grid-pattern-dark'
-                : 'bg-grid-pattern-light'
+              ? 'bg-grid-pattern-dark'
+              : 'bg-grid-pattern-light'
               }`}></div>
           </div>
         </div>
@@ -291,14 +270,14 @@ const onClose = () => {
               className="order-2 lg:order-1"
             >
               <span className={`inline-block px-4 py-1 rounded-full text-sm font-medium mb-6 ${isDark
-                  ? 'bg-purple-900/50 text-purple-300'
-                  : 'bg-emerald-100 text-emerald-800'
+                ? 'bg-purple-900/50 text-purple-300'
+                : 'bg-emerald-100 text-emerald-800'
                 }`}>
                 {t('AI驱动的运价解析解决方案')}
               </span>
               <h1 className={`text-4xl md:text-6xl font-bold mb-6 ${isDark
-                  ? 'bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300'
-                  : 'bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-emerald-800'
+                ? 'bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300'
+                : 'bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-emerald-800'
                 }`}>
                 <div dangerouslySetInnerHTML={{ __html: t('智能解析邮件运价<br />提升货代工作效率') }} />
               </h1>
@@ -311,8 +290,8 @@ const onClose = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.98 }}
                   className={`font-semibold py-3 px-8 rounded-md text-lg flex items-center justify-center ${isDark
-                      ? 'bg-purple-500 hover:bg-purple-600 text-white'
-                      : 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                    ? 'bg-purple-500 hover:bg-purple-600 text-white'
+                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
                     }`}
                 >
                   {t('免费试用14天')} <ArrowRight className="ml-2 h-5 w-5" />
@@ -322,8 +301,8 @@ const onClose = () => {
                   whileTap={{ scale: 0.98 }}
                   onClick={openVideo}
                   className={`font-semibold py-3 px-8 rounded-md text-lg flex items-center justify-center ${isDark
-                      ? 'bg-transparent border-2 border-purple-400 text-purple-300 hover:text-purple-200 hover:border-purple-300'
-                      : 'bg-transparent border-2 border-emerald-500 text-emerald-700 hover:text-emerald-800 hover:border-emerald-600'
+                    ? 'bg-transparent border-2 border-purple-400 text-purple-300 hover:text-purple-200 hover:border-purple-300'
+                    : 'bg-transparent border-2 border-emerald-500 text-emerald-700 hover:text-emerald-800 hover:border-emerald-600'
                     }`}
                 >
                   {t('观看演示')}
@@ -387,8 +366,8 @@ const onClose = () => {
                 viewport={{ once: true }}
                 whileHover={{ y: -5 }}
                 className={`p-8 rounded-xl border relative overflow-hidden transition-all ${isDark
-                    ? 'bg-gray-800/80 border-gray-700 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10'
-                    : 'bg-white border-gray-200 hover:border-emerald-400/50 hover:shadow-lg hover:shadow-emerald-300/20'
+                  ? 'bg-gray-800/80 border-gray-700 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10'
+                  : 'bg-white border-gray-200 hover:border-emerald-400/50 hover:shadow-lg hover:shadow-emerald-300/20'
                   }`}
               >
                 {/* Decorative corner element */}
@@ -455,8 +434,8 @@ const onClose = () => {
 
               <div className="mt-8">
                 <button className={`font-semibold py-2.5 px-6 rounded-md flex items-center ${isDark
-                    ? 'bg-purple-500 hover:bg-purple-600 text-white'
-                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                  ? 'bg-purple-500 hover:bg-purple-600 text-white'
+                  : 'bg-emerald-500 hover:bg-emerald-600 text-white'
                   }`}>
                   {t('了解更多')} <ChevronRight className="ml-1 h-4 w-4" />
                 </button>
@@ -469,8 +448,8 @@ const onClose = () => {
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
               className={`p-6 rounded-xl border relative overflow-hidden ${isDark
-                  ? 'bg-gray-800/80 border-gray-700'
-                  : 'bg-white border-gray-200'
+                ? 'bg-gray-800/80 border-gray-700'
+                : 'bg-white border-gray-200'
                 }`}
             >
               {/* Technical circuit board pattern overlay */}
@@ -633,8 +612,8 @@ const onClose = () => {
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     whileHover={{ y: -5 }}
                     className={`inline-block flex-shrink-0 w-80 md:w-96 p-6 rounded-xl border relative transition-all ${isDark
-                        ? 'bg-gray-800/80 border-gray-700 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10'
-                        : 'bg-white border-gray-200 hover:border-emerald-400/50 hover:shadow-lg hover:shadow-emerald-300/20'
+                      ? 'bg-gray-800/80 border-gray-700 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10'
+                      : 'bg-white border-gray-200 hover:border-emerald-400/50 hover:shadow-lg hover:shadow-emerald-300/20'
                       }`}
                   >
                     {/* Technical pattern in background */}
@@ -673,9 +652,9 @@ const onClose = () => {
 
 
 
-      
 
-      
+
+
 
       {/* Add global styles for AI lab patterns */}
       <style>{`
@@ -696,48 +675,48 @@ const onClose = () => {
 
       {/* 观看视频 */}
       <AnimatePresence>
-      {isOpen && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-          onClick={onClose}
-        >
+        {isOpen && (
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            className="relative w-full max-w-4xl rounded-xl overflow-hidden shadow-2xl"
-            onClick={e => e.stopPropagation()}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            onClick={onClose}
           >
-            {/* Close button */}
-            <button 
-              onClick={onClose}
-              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors backdrop-blur-sm"
-              aria-label="关闭视频"
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              className="relative w-full max-w-4xl rounded-xl overflow-hidden shadow-2xl"
+              onClick={e => e.stopPropagation()}
             >
-              <X size={24} />
-            </button>
-            
-            {/* Video container */}
-            <div className="aspect-video bg-black">
-              <video
-                src={videoUrl}
-                controls
-                autoPlay
-                className="w-full h-full object-contain"
-                onError={(e) => {
-                  console.error('Video loading error:', e);
-                }}
+              {/* Close button */}
+              <button
+                onClick={onClose}
+                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors backdrop-blur-sm"
+                aria-label="关闭视频"
               >
-                您的浏览器不支持视频播放。
-              </video>
-            </div>
+                <X size={24} />
+              </button>
+
+              {/* Video container */}
+              <div className="aspect-video bg-black">
+                <video
+                  src={videoUrl}
+                  controls
+                  autoPlay
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    console.error('Video loading error:', e);
+                  }}
+                >
+                  您的浏览器不支持视频播放。
+                </video>
+              </div>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
 
 
       {/* Contact Modal */}
