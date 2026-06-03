@@ -1069,7 +1069,7 @@ const Workbench: React.FC = () => {
                         }`}
                       onClick={() => setResultViewTab('table')}
                     >
-                      {t('table')}
+                      Table
                     </button>
                   </div>
                 </div>
@@ -1119,65 +1119,56 @@ const Workbench: React.FC = () => {
                   </pre>
                 ) : (
                   <div className="overflow-auto h-full">
-                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                      <thead className={isDark ? "bg-gray-750" : "bg-gray-50"}>
-                        <tr>
-                          {jsonResult?.result?.prices && jsonResult.result.prices.length > 0 ? (
-                            // 如果存在prices数组，则使用第一个对象的键作为表头
-                            Object.keys(jsonResult.result.prices[0]).map((key) => (
-                              <th
-                                key={key}
-                                scope="col"
-                                className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider"
-                              >
-                                {key}
-                              </th>
-                            ))
-                          ) : (
-                            // 否则使用jsonResult的键作为表头
-                            Object.keys(jsonResult).map((key) => (
-                              <th
-                                key={key}
-                                scope="col"
-                                className="px-3 py-2 text-left text-xs font-medium uppercase tracking-wider"
-                              >
-                                {key}
-                              </th>
-                            ))
-                          )}
-                        </tr>
-                      </thead>
-                      <tbody className={cn("divide-y divide-gray-200 dark:divide-gray-700",
-                        isDark ? "bg-gray-800" : "bg-white"
-                      )}>
-                        {jsonResult?.result?.prices && jsonResult.result.prices.length > 0 ? (
-                          // 如果存在prices数组，则遍历每一项作为一行
-                          jsonResult.result.prices.map((priceObj: any, rowIndex: number) => (
-                            <tr key={rowIndex}>
-                              {Object.values(priceObj).map((value: any, index) => (
-                                <td
-                                  key={index}
-                                  className="px-3 py-2 whitespace-nowrap text-sm"
-                                >
-                                  {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                                </td>
+                    <table className="min-w-full divide-y divide-x divide-gray-100 dark:divide-gray-700">
+                      {(() => {
+                        // 统一提取列名：合并所有对象的 key，保证列顺序一致
+                        const tableColumns: string[] = jsonResult?.result?.prices && jsonResult.result.prices.length > 0
+                          ? Array.from(new Set(jsonResult.result.prices.flatMap((item: any) => Object.keys(item))))
+                          : Object.keys(jsonResult || {});
+                        const tableRows = jsonResult?.result?.prices && jsonResult.result.prices.length > 0
+                          ? jsonResult.result.prices
+                          : [jsonResult];
+                        return (
+                          <>
+                            <thead className={isDark ? "bg-gray-700" : "bg-gray-100"}>
+                              <tr>
+                                {tableColumns.map((key) => (
+                                  <th
+                                    key={key}
+                                    scope="col"
+                                    className={`px-3 py-2 text-left text-sm font-semibold uppercase tracking-wider ${isDark ? 'text-gray-200' : 'text-gray-700'}`}
+                                  >
+                                    {key}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody className={cn("divide-y divide-x divide-gray-100 dark:divide-gray-700",
+                              isDark ? "bg-gray-800" : "bg-white"
+                            )}>
+                              {tableRows.map((rowObj: any, rowIndex: number) => (
+                                <tr key={rowIndex}>
+                                  {tableColumns.map((key) => {
+                                    const value = rowObj?.[key];
+                                    return (
+                                      <td
+                                        key={key}
+                                        className="px-3 py-2 whitespace-nowrap text-sm"
+                                      >
+                                        {value === undefined || value === null
+                                          ? ''
+                                          : typeof value === 'object'
+                                            ? JSON.stringify(value)
+                                            : String(value)}
+                                      </td>
+                                    );
+                                  })}
+                                </tr>
                               ))}
-                            </tr>
-                          ))
-                        ) : (
-                          // 否则按照原来的方式显示jsonResult
-                          <tr>
-                            {Object.values(jsonResult).map((value: any, index) => (
-                              <td
-                                key={index}
-                                className="px-3 py-2 whitespace-nowrap text-sm"
-                              >
-                                {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                              </td>
-                            ))}
-                          </tr>
-                        )}
-                      </tbody>
+                            </tbody>
+                          </>
+                        );
+                      })()}
                     </table>
                   </div>
                 )

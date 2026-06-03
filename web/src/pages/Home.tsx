@@ -7,6 +7,7 @@ import { useI18nContext } from '@/contexts/i18nContext';
 import { useThemeContext } from '@/contexts/themeContext';
 import { X } from 'lucide-react';
 import DotMatrixText from '@/components/DotMatrixText';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -25,6 +26,7 @@ const TerminalPreview = () => {
   const { isDark } = useThemeContext();
   const accentColor = isDark ? 'text-purple-400' : 'text-emerald-500';
 
+ 
 
 
 
@@ -102,6 +104,7 @@ const TerminalPreview = () => {
 
 const Home: React.FC = () => {
   const { isDark } = useThemeContext();
+  const navigate = useNavigate();
   const [contactModalOpen, setContactModalOpen] = useState(false);
 
 
@@ -293,6 +296,7 @@ const Home: React.FC = () => {
                     ? 'bg-purple-500 hover:bg-purple-600 text-white'
                     : 'bg-emerald-500 hover:bg-emerald-600 text-white'
                     }`}
+                  onClick={() => navigate('/system/workbench')}
                 >
                   {t('免费试用14天')} <ArrowRight className="ml-2 h-5 w-5" />
                 </motion.button>
