@@ -184,11 +184,11 @@ const Saijia: React.FC = () => {
   };
 
   return (
-    <div className={isDark ? "p-6 bg-gray-900 text-gray-100 min-h-screen" : "p-6 bg-gray-50 text-gray-900 min-h-screen"}>
+    <div className="workspace-page">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold">{t('saijiaParser')}</h1>
-          <p className={isDark ? "text-gray-400" : "text-gray-600"}>{t('contentAnalysisWorkbench')}</p>
+        <div className="workspace-hero text-center">
+          <h1 className="text-3xl font-semibold text-app">{t('saijiaParser')}</h1>
+          <p className="mt-2 workspace-muted">{t('contentAnalysisWorkbench')}</p>
         </div>
 
         {/* 控制按钮区 */}
@@ -196,11 +196,7 @@ const Saijia: React.FC = () => {
           <button 
             onClick={parseContent}
             disabled={isParsing}
-            className={cn("px-4 py-2 text-sm rounded-md flex items-center",
-              isDark 
-                ? "bg-blue-600 hover:bg-blue-700 text-white" 
-                : "bg-blue-500 hover:bg-blue-600 text-white"
-            )}
+            className="workspace-button-primary"
           >
             {isParsing ? (
               <>
@@ -217,11 +213,7 @@ const Saijia: React.FC = () => {
           
           <button 
             onClick={() => setResultViewTab('json')}
-            className={cn("px-4 py-2 text-sm rounded-md flex items-center",
-              isDark 
-                ? "bg-gray-600 hover:bg-gray-700 text-white" 
-                : "bg-gray-300 hover:bg-gray-400 text-gray-800"
-            )}
+            className="workspace-button-secondary"
           >
             <RotateCcw size={14} className="mr-2" />
             {t('reset')}
@@ -231,11 +223,7 @@ const Saijia: React.FC = () => {
         {/* 主工作区 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-[calc(100vh-200px)]">
           {/* 左侧富文本编辑器 */}
-          <div className={cn("rounded-lg border shadow-sm overflow-hidden flex flex-col",
-            isDark 
-              ? "bg-gray-800 border-gray-700" 
-              : "bg-white border-gray-200"
-          )}>
+          <div className="workspace-card overflow-hidden flex flex-col">
             <div className={cn("p-4 border-b",
               isDark 
                 ? "border-gray-700 bg-gray-750" 
@@ -263,11 +251,7 @@ const Saijia: React.FC = () => {
           </div>
 
           {/* 右侧解析结果区 */}
-          <div className={cn("rounded-lg border shadow-sm overflow-hidden flex flex-col",
-            isDark 
-              ? "bg-gray-800 border-gray-700" 
-              : "bg-white border-gray-200"
-          )}>
+          <div className="workspace-card overflow-hidden flex flex-col">
             <div className={cn("p-4 border-b flex justify-between items-center",
               isDark 
                 ? "border-gray-700 bg-gray-750" 

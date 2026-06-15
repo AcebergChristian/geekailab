@@ -23,8 +23,7 @@ const efficiencyData = [
 
 // Terminal preview component for AI lab feel
 const TerminalPreview = () => {
-  const { isDark } = useThemeContext();
-  const accentColor = isDark ? 'text-purple-400' : 'text-emerald-500';
+  const accentColor = 'text-app-accent';
 
  
 
@@ -36,45 +35,45 @@ const TerminalPreview = () => {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
       viewport={{ once: true }}
-      className={`${isDark ? 'bg-gray-900' : 'bg-gray-100'} rounded-xl border ${isDark ? 'border-gray-700' : 'border-gray-300'} shadow-xl overflow-hidden`}
+      className="app-card overflow-hidden rounded-[28px]"
     >
-      <div className={`${isDark ? 'bg-gray-800' : 'bg-gray-200'} px-4 py-2 flex items-center`}>
+      <div className="flex items-center border-b border-app bg-app-muted px-4 py-2">
         <div className="flex space-x-2">
           <div className="w-3 h-3 rounded-full bg-red-500"></div>
           <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
           <div className="w-3 h-3 rounded-full bg-green-500"></div>
         </div>
-        <div className={`mx-auto text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+        <div className="mx-auto text-sm text-app-faint">
           AI-Freight-Parser Terminal
         </div>
       </div>
       <div className="p-5 font-mono text-sm">
         <div className="mb-2">
-          <span className={accentColor}>$</span> <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>freight-parser analyze latest-email.txt</span>
+          <span className={accentColor}>$</span> <span className="text-app-soft">freight-parser analyze latest-email.txt</span>
         </div>
-        <div className={`mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+        <div className="mb-2 text-app-faint">
           <span className={accentColor}>✓</span> Email loaded successfully
         </div>
-        <div className={`mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+        <div className="mb-2 text-app-faint">
           <span className={accentColor}>✓</span> Detecting carrier: <span className="font-bold">Maersk</span>
         </div>
-        <div className={`mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+        <div className="mb-2 text-app-faint">
           <span className={accentColor}>✓</span> Extracting rates from 35航线...
         </div>
-        <div className={`mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+        <div className="mb-2 text-app-faint">
           <span className={accentColor}>✓</span> Found 12 rate entries
         </div>
-        <div className={`mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+        <div className="mb-4 text-app-faint">
           <span className={accentColor}>✓</span> Processing complete in 2.4s
         </div>
-        <div className={`p-2 rounded ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+        <div className="rounded-2xl border border-app bg-app-elevated p-2">
           <div className="flex justify-between mb-1">
             <span>航线</span>
             <span>港口</span>
             <span>价格</span>
             <span>有效期</span>
           </div>
-          <div className={`h-px ${isDark ? 'bg-gray-700' : 'bg-gray-300'} my-1`}></div>
+          <div className="my-1 h-px bg-[var(--border)]"></div>
           <div className="flex justify-between text-xs mb-1">
             <span>AE1</span>
             <span>CNHKG-AESGH</span>
@@ -95,7 +94,7 @@ const TerminalPreview = () => {
           </div>
         </div>
         <div className="mt-3">
-          <span className={accentColor}>$</span> <span className={isDark ? 'text-gray-300' : 'text-gray-700'}><span className="animate-pulse">▌</span></span>
+          <span className={accentColor}>$</span> <span className="text-app-soft"><span className="animate-pulse">▌</span></span>
         </div>
       </div>
     </motion.div>
@@ -131,27 +130,27 @@ const Home: React.FC = () => {
     {
       title: t('智能邮件解析'),
       description: t('自动识别并提取船司发送的运价邮件中的关键信息，包括航线、港口、价格、有效期等。'),
-      icon: <BarChart3 className={`h-10 w-10 ${isDark ? 'text-purple-400' : 'text-emerald-500'}`} />
+      icon: <BarChart3 className="h-10 w-10 text-app-accent" />
     },
     {
       title: t('实时数据更新'),
       description: t('解析结果实时更新，确保您获取到最新的运价信息，不错过任何市场变化。'),
-      icon: <Clock className={`h-10 w-10 ${isDark ? 'text-purple-400' : 'text-emerald-500'}`} />
+      icon: <Clock className="h-10 w-10 text-app-accent" />
     },
     {
       title: t('安全可靠'),
       description: t('采用先进的加密技术保护您的邮件数据，确保信息安全不泄露。'),
-      icon: <Shield className={`h-10 w-10 ${isDark ? 'text-purple-400' : 'text-emerald-500'}`} />
+      icon: <Shield className="h-10 w-10 text-app-accent" />
     },
     {
       title: t('团队协作'),
       description: t('支持多人共享和协作，提高团队工作效率，减少沟通成本。'),
-      icon: <Users className={`h-10 w-10 ${isDark ? 'text-purple-400' : 'text-emerald-500'}`} />
+      icon: <Users className="h-10 w-10 text-app-accent" />
     },
     {
       title: t('多语言支持'),
       description: t('支持解析多种语言的运价邮件，满足全球化业务需求。'),
-      icon: <Globe className={`h-10 w-10 ${isDark ? 'text-purple-400' : 'text-emerald-500'}`} />
+      icon: <Globe className="h-10 w-10 text-app-accent" />
     },
   ];
 
@@ -219,15 +218,14 @@ const Home: React.FC = () => {
   ];
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-gradient-to-br from-gray-900 to-purple-950 text-white' : 'bg-gradient-to-br from-white to-green-50 text-gray-900'} overflow-x-hidden transition-colors duration-300`}>
+    <div className="overflow-x-hidden transition-colors duration-300">
 
 
 
 
 
       {/* home welcome Section */}
-      <section className={`relative w-full h-[360px] overflow-hidden flex items-center justify-center ${isDark ? 'bg-gray-900' : 'bg-gray-50'
-        }`}>
+      <section className="relative flex h-[360px] w-full items-center justify-center overflow-hidden">
         <DotMatrixText />
       </section>
 
@@ -237,20 +235,17 @@ const Home: React.FC = () => {
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <div className={`absolute inset-0 ${isDark
-            ? 'bg-gradient-to-r from-purple-900/30 to-indigo-900/30'
-            : 'bg-gradient-to-r from-emerald-100/50 to-teal-100/50'
-            }`}></div>
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(214,117,86,0.10),transparent_65%)]"></div>
           <div className="absolute top-0 left-0 w-full h-full opacity-10">
             {isDark ? (
               <>
-                <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-purple-500 filter blur-3xl"></div>
-                <div className="absolute top-2/3 right-1/4 w-72 h-72 rounded-full bg-indigo-500 filter blur-3xl"></div>
+                <div className="absolute top-1/4 left-1/4 h-64 w-64 rounded-full bg-[#d67556] opacity-70 filter blur-3xl"></div>
+                <div className="absolute top-2/3 right-1/4 h-72 w-72 rounded-full bg-[#8a5f51] opacity-60 filter blur-3xl"></div>
               </>
             ) : (
               <>
-                <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-emerald-400 filter blur-3xl"></div>
-                <div className="absolute top-2/3 right-1/4 w-72 h-72 rounded-full bg-teal-400 filter blur-3xl"></div>
+                <div className="absolute top-1/4 left-1/4 h-64 w-64 rounded-full bg-[#d67556] opacity-35 filter blur-3xl"></div>
+                <div className="absolute top-2/3 right-1/4 h-72 w-72 rounded-full bg-[#f1c1a9] opacity-90 filter blur-3xl"></div>
               </>
             )}
           </div>
@@ -272,15 +267,12 @@ const Home: React.FC = () => {
               transition={{ duration: 0.6 }}
               className="order-2 lg:order-1"
             >
-              <span className={`inline-block px-4 py-1 rounded-full text-sm font-medium mb-6 ${isDark
-                ? 'bg-purple-900/50 text-purple-300'
-                : 'bg-emerald-100 text-emerald-800'
-                }`}>
+              <span className="mb-6 inline-block rounded-full bg-[var(--accent-soft)] px-4 py-1 text-sm font-medium text-app-accent">
                 {t('AI驱动的运价解析解决方案')}
               </span>
               <h1 className={`text-4xl md:text-6xl font-bold mb-6 ${isDark
-                ? 'bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300'
-                : 'bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-emerald-800'
+                ? 'bg-clip-text text-transparent bg-[linear-gradient(90deg,#ffffff_0%,#f0c0af_100%)]'
+                : 'bg-clip-text text-transparent bg-[linear-gradient(90deg,#1f1a17_0%,#d67556_100%)]'
                 }`}>
                 <div dangerouslySetInnerHTML={{ __html: t('智能解析邮件运价<br />提升货代工作效率') }} />
               </h1>
@@ -292,10 +284,7 @@ const Home: React.FC = () => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`font-semibold py-3 px-8 rounded-md text-lg flex items-center justify-center ${isDark
-                    ? 'bg-purple-500 hover:bg-purple-600 text-white'
-                    : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                    }`}
+                  className="app-button-primary rounded-2xl px-8 py-3 text-lg"
                   onClick={() => navigate('/system/workbench')}
                 >
                   {t('免费试用14天')} <ArrowRight className="ml-2 h-5 w-5" />
@@ -304,10 +293,7 @@ const Home: React.FC = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={openVideo}
-                  className={`font-semibold py-3 px-8 rounded-md text-lg flex items-center justify-center ${isDark
-                    ? 'bg-transparent border-2 border-purple-400 text-purple-300 hover:text-purple-200 hover:border-purple-300'
-                    : 'bg-transparent border-2 border-emerald-500 text-emerald-700 hover:text-emerald-800 hover:border-emerald-600'
-                    }`}
+                  className="app-button-ghost rounded-2xl border-2 px-8 py-3 text-lg"
                 >
                   {t('观看演示')}
                 </motion.button>
@@ -370,16 +356,14 @@ const Home: React.FC = () => {
                 viewport={{ once: true }}
                 whileHover={{ y: -5 }}
                 className={`p-8 rounded-xl border relative overflow-hidden transition-all ${isDark
-                  ? 'bg-gray-800/80 border-gray-700 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10'
-                  : 'bg-white border-gray-200 hover:border-emerald-400/50 hover:shadow-lg hover:shadow-emerald-300/20'
+                  ? 'bg-gray-800/80 border-gray-700 hover:border-[color:var(--accent-border)]'
+                  : 'bg-white border-gray-200 hover:border-[color:var(--accent-border)]'
                   }`}
               >
                 {/* Decorative corner element */}
-                <div className={`absolute top-0 right-0 w-20 h-20 -mr-10 -mt-10 rounded-full opacity-10 ${isDark ? 'bg-purple-500' : 'bg-emerald-400'
-                  }`}></div>
+                <div className="absolute top-0 right-0 -mr-10 -mt-10 h-20 w-20 rounded-full bg-[color:var(--accent)] opacity-10"></div>
 
-                <div className={`mb-6 inline-block p-3 rounded-lg ${isDark ? 'bg-purple-900/30' : 'bg-emerald-100'
-                  }`}>
+                <div className="mb-6 inline-block rounded-lg bg-[var(--accent-soft)] p-3">
                   {feature.icon}
                 </div>
                 <h3 className={`text-xl font-bold mb-3 ${isDark ? 'text-white' : 'text-gray-900'
@@ -395,9 +379,6 @@ const Home: React.FC = () => {
       {/* Benefits Section with Chart */}
       <section id="benefits" className="py-24 relative">
         {/* Decorative elements for AI lab feel */}
-        <div className="absolute top-1/4 right-1/4 w-32 h-32 rounded-full opacity-10 blur-xl bg-gradient-to-r from-purple-500 to-indigo-500"></div>
-        <div className="absolute bottom-1/4 left-1/3 w-40 h-40 rounded-full opacity-10 blur-xl bg-gradient-to-r from-emerald-500 to-teal-500"></div>
-
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -429,18 +410,14 @@ const Home: React.FC = () => {
                     viewport={{ once: true }}
                     className="flex items-start"
                   >
-                    <CheckCircle className={`h-6 w-6 mr-3 flex-shrink-0 mt-1 ${isDark ? 'text-purple-400' : 'text-emerald-500'
-                      }`} />
+                    <CheckCircle className="mt-1 mr-3 h-6 w-6 flex-shrink-0 text-app-accent" />
                     <span className={isDark ? 'text-gray-200' : 'text-gray-800'}>{benefit}</span>
                   </motion.li>
                 ))}
               </ul>
 
               <div className="mt-8">
-                <button className={`font-semibold py-2.5 px-6 rounded-md flex items-center ${isDark
-                  ? 'bg-purple-500 hover:bg-purple-600 text-white'
-                  : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                  }`}>
+                <button className="app-button-primary rounded-2xl px-6 py-2.5">
                   {t('了解更多')} <ChevronRight className="ml-1 h-4 w-4" />
                 </button>
               </div>
@@ -487,7 +464,7 @@ const Home: React.FC = () => {
                       type="monotone"
                       dataKey="traditional"
                       name={t('传统方式')}
-                      stroke={isDark ? "#8884d8" : "#6b7280"}
+                      stroke={isDark ? "#9f938b" : "#7a6d65"}
                       activeDot={{ r: 8 }}
                       strokeWidth={2}
                     />
@@ -495,7 +472,8 @@ const Home: React.FC = () => {
                       type="monotone"
                       dataKey="withAI"
                       name={t('AI解析')}
-                      stroke={isDark ? "#a855f7" : "#10b981"}
+                      stroke="#d67556"
+                      activeDot={{ r: 7, fill: '#d67556', stroke: '#d67556' }}
                       strokeWidth={2}
                     />
                   </LineChart>
@@ -531,7 +509,7 @@ const Home: React.FC = () => {
 
           <div className="relative">
             {/* Connecting line for desktop with AI style */}
-            <div className={`hidden lg:block absolute left-1/2 top-12 bottom-12 w-0.5 transform -translate-x-1/2 ${isDark ? 'bg-gradient-to-b from-purple-500/80 to-transparent' : 'bg-gradient-to-b from-emerald-500/80 to-transparent'
+            <div className={`hidden lg:block absolute left-1/2 top-12 bottom-12 w-0.5 transform -translate-x-1/2 ${isDark ? 'bg-[linear-gradient(180deg,rgba(214,117,86,0.82),transparent)]' : 'bg-[linear-gradient(180deg,rgba(214,117,86,0.72),transparent)]'
               }`}></div>
 
             <div className="space-y-12 lg:space-y-0">
@@ -552,8 +530,7 @@ const Home: React.FC = () => {
                       }`}>{item.description}</p>
                   </div>
 
-                  <div className={`flex-shrink-0 z-10 w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold my-6 ${isDark ? 'bg-purple-600' : 'bg-emerald-500'
-                    }`}>
+                  <div className="my-6 flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-app-accent text-xl font-bold text-white">
                     {item.step}
                   </div>
 
@@ -616,8 +593,8 @@ const Home: React.FC = () => {
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     whileHover={{ y: -5 }}
                     className={`inline-block flex-shrink-0 w-80 md:w-96 p-6 rounded-xl border relative transition-all ${isDark
-                      ? 'bg-gray-800/80 border-gray-700 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10'
-                      : 'bg-white border-gray-200 hover:border-emerald-400/50 hover:shadow-lg hover:shadow-emerald-300/20'
+                      ? 'bg-gray-800/80 border-gray-700 hover:border-[color:var(--accent-border)]'
+                      : 'bg-white border-gray-200 hover:border-[color:var(--accent-border)]'
                       }`}
                   >
                     {/* Technical pattern in background */}
@@ -635,8 +612,7 @@ const Home: React.FC = () => {
                     <p className={`mb-5 break-words whitespace-normal italic ${isDark ? 'text-gray-300' : 'text-gray-700'
                       }`}>"{testimonial.quote}"</p>
                     <div className="flex items-center">
-                      <div className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold mr-3 ${isDark ? 'bg-purple-600' : 'bg-emerald-500'
-                        }`}>
+                      <div className="mr-3 flex h-10 w-10 items-center justify-center rounded-full bg-app-accent text-sm font-bold text-white">
                         {testimonial.avatar}
                       </div>
                       <div>
@@ -691,7 +667,7 @@ const Home: React.FC = () => {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
-              className="relative w-full max-w-4xl rounded-xl overflow-hidden shadow-2xl"
+              className="relative w-full max-w-4xl overflow-hidden rounded-xl border border-white/10"
               onClick={e => e.stopPropagation()}
             >
               {/* Close button */}

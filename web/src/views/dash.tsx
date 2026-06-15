@@ -1,165 +1,293 @@
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import * as echarts from 'echarts';
+import worldJson from '@/assets/world.json';
 import { useThemeContext } from '@/contexts/themeContext';
 import { useI18nContext } from '@/contexts/i18nContext';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  AreaChart,
+  Area
+} from 'recharts';
 
+echarts.registerMap('world_map', worldJson as never);
 
-// 指标卡片类型
 interface MetricCardProps {
   title: string;
   value: string | number;
   change?: string;
-  icon?: React.ReactNode;
-  color?: string;
+  icon?: ReactNode;
 }
 
-// 指标卡片组件
-const MetricCard: React.FC<MetricCardProps> = ({ title, value, change, icon, color = 'blue' }) => {
-  const { isDark } = useThemeContext();
-  
+const chartPalette = ['#d67556', '#b98b7d', '#8c7b73', '#6f655f', '#4d4742'];
+
+const MetricCard = ({ title, value, change, icon }: MetricCardProps) => {
+  const positive = change?.startsWith('+');
+
   return (
-    <div className={isDark 
-      ? "bg-gray-800 border border-gray-700 rounded-lg p-4 shadow" 
-      : "bg-white border border-gray-200 rounded-lg p-4 shadow"
-    }>
-      <div className="flex items-center justify-between">
+    <div className="workspace-card p-5">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <p className={isDark ? "text-gray-400 text-sm" : "text-gray-500 text-sm"}>{title}</p>
-          <p className={isDark ? "text-2xl font-bold text-white mt-1" : "text-2xl font-bold text-gray-900 mt-1"}>{value}</p>
+          <p className="workspace-muted text-sm">{title}</p>
+          <p className="mt-2 text-3xl font-semibold text-app">{value}</p>
           {change && (
-            <p className={change.startsWith('+') 
-              ? "text-green-500 text-sm mt-1" 
-              : "text-red-500 text-sm mt-1"
-            }>
-              {change}
-            </p>
+            <p className={`mt-2 text-sm ${positive ? 'text-app-accent' : 'text-[#9d7466]'}`}>{change}</p>
           )}
         </div>
-        {icon && <div className={`text-${color}-500`}>{icon}</div>}
+        {icon && <div className="text-xl text-app-accent">{icon}</div>}
       </div>
     </div>
   );
 };
 
-// 邮件类型颜色映射
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+type GeoPoint = { name: string; value: [number, number, number]; country: string };
 
+const regionCountries = [
+  { name: 'United States', value: 120, ports: ['Los Angeles', 'Long Beach', 'New York/New Jersey'] },
+  { name: 'Brazil', value: 84, ports: ['Santos', 'Rio de Janeiro', 'Paranagua'] },
+  { name: 'United Kingdom', value: 58, ports: ['Felixstowe', 'Southampton', 'London Gateway'] },
+  { name: 'Germany', value: 73, ports: ['Hamburg', 'Bremerhaven', 'Wilhelmshaven'] },
+  { name: 'China', value: 136, ports: ['Shanghai', 'Ningbo-Zhoushan', 'Shenzhen', 'Qingdao'] },
+  { name: 'Japan', value: 92, ports: ['Tokyo', 'Yokohama', 'Osaka'] },
+  { name: 'Singapore', value: 150, ports: ['PSA Singapore', 'Tanjong Pagar', 'Pasir Panjang'] },
+  { name: 'United Arab Emirates', value: 88, ports: ['Jebel Ali', 'Khalifa Port', 'Port Rashid'] },
+  { name: 'Australia', value: 67, ports: ['Sydney', 'Melbourne', 'Brisbane'] },
+  { name: 'France', value: 49, ports: ['Le Havre', 'Marseille Fos', 'Dunkirk'] },
+  { name: 'India', value: 76, ports: ['Nhava Sheva', 'Mundra', 'Chennai'] },
+  { name: 'Korea', value: 71, ports: ['Busan', 'Incheon', 'Gwangyang'] }
+];
 
+const portPoints: GeoPoint[] = [
+  { name: 'Los Angeles', country: 'United States', value: [-118.2437, 34.0522, 86] },
+  { name: 'Long Beach', country: 'United States', value: [-118.1937, 33.7701, 90] },
+  { name: 'New York / NJ', country: 'United States', value: [-74.006, 40.7128, 78] },
+  { name: 'Santos', country: 'Brazil', value: [-46.3336, -23.9618, 72] },
+  { name: 'Hamburg', country: 'Germany', value: [9.9937, 53.5511, 80] },
+  { name: 'Felixstowe', country: 'United Kingdom', value: [1.351, 51.958, 65] },
+  { name: 'Shanghai', country: 'China', value: [121.4737, 31.2304, 98] },
+  { name: 'Ningbo', country: 'China', value: [121.5505, 29.8746, 84] },
+  { name: 'Shenzhen', country: 'China', value: [114.0579, 22.5431, 91] },
+  { name: 'Tokyo', country: 'Japan', value: [139.6917, 35.6895, 76] },
+  { name: 'Singapore', country: 'Singapore', value: [103.8198, 1.3521, 100] },
+  { name: 'Jebel Ali', country: 'United Arab Emirates', value: [55.0, 25.0, 88] },
+  { name: 'Sydney', country: 'Australia', value: [151.2093, -33.8688, 63] },
+  { name: 'Le Havre', country: 'France', value: [0.1079, 49.4944, 57] },
+  { name: 'Nhava Sheva', country: 'India', value: [72.9347, 18.9496, 74] },
+  { name: 'Busan', country: 'Korea', value: [129.0756, 35.1796, 71] }
+];
 
-// 引入地图相关的类型和组件
-interface MapData {
-  country: string;
-  value: number;
-  color: string;
-}
-
-// 地图组件
-const WorldMap: React.FC<{ data: MapData[]; t: (key: string) => string }> = ({ data, t }) => {
+const RegionalMap: React.FC<{
+  onCountryHover: (country: string) => void;
+  activeCountry: string;
+}> = ({ onCountryHover, activeCountry }) => {
   const { isDark } = useThemeContext();
-  
-  // 模拟国家数据
-  const countries = [
-    { id: 'USA', name: 'United States', value: 120 },
-    { id: 'CHN', name: 'China', value: 95 },
-    { id: 'DEU', name: 'Germany', value: 75 },
-    { id: 'JPN', name: 'Japan', value: 68 },
-    { id: 'GBR', name: 'United Kingdom', value: 55 },
-    { id: 'FRA', name: 'France', value: 50 },
-    { id: 'IND', name: 'India', value: 45 },
-    { id: 'BRA', name: 'Brazil', value: 40 },
-    { id: 'CAN', name: 'Canada', value: 35 },
-    { id: 'AUS', name: 'Australia', value: 30 },
-  ];
-  
-  // 计算颜色值
-  const maxValue = Math.max(...countries.map(c => c.value));
-  
+  const elRef = useRef<HTMLDivElement | null>(null);
+  const chartRef = useRef<echarts.EChartsType | null>(null);
+
+  useEffect(() => {
+    if (!elRef.current) return;
+
+    const chart = echarts.init(elRef.current, undefined, { renderer: 'canvas' });
+    chartRef.current = chart;
+
+    const countryData = regionCountries.map((country) => ({
+      name: country.name,
+      value: country.value
+    }));
+
+    chart.setOption({
+      backgroundColor: 'transparent',
+      animationDuration: 900,
+      animationEasing: 'cubicOut',
+      tooltip: {
+        trigger: 'item',
+        borderWidth: 0,
+        backgroundColor: isDark ? '#202020' : '#fcfcfb',
+        textStyle: { color: isDark ? '#f3efe9' : '#201c19' },
+        formatter: (params: any) => {
+          if (params.seriesType === 'scatter') {
+            return `${params.data.country}<br/>${params.name}<br/>Active routes: ${params.data.value[2]}`;
+          }
+          if (params.name) {
+            const country = regionCountries.find((item) => item.name === params.name);
+            return `${params.name}<br/>Active routes: ${country?.value ?? params.value ?? 0}`;
+          }
+          return '';
+        }
+      },
+      geo: {
+        map: 'world_map',
+        roam: true,
+        zoom: 1.06,
+        scaleLimit: { min: 0.85, max: 4 },
+        itemStyle: {
+          areaColor: isDark ? '#222222' : '#f6f4ef',
+          borderColor: isDark ? '#434343' : '#d7d0c8',
+          borderWidth: 0.8
+        },
+        emphasis: {
+          itemStyle: {
+            areaColor: '#d67556',
+            borderColor: '#d67556',
+            shadowBlur: 18,
+            shadowColor: 'rgba(214,117,86,0.24)'
+          },
+          label: { show: false }
+        }
+      },
+      series: [
+        {
+          type: 'map',
+          map: 'world_map',
+          geoIndex: 0,
+          data: countryData,
+          label: { show: false },
+          itemStyle: {
+            areaColor: isDark ? '#222222' : '#f6f4ef',
+            borderColor: isDark ? '#434343' : '#d7d0c8'
+          },
+          emphasis: {
+            label: { show: false },
+            itemStyle: {
+              areaColor: '#d67556',
+              borderColor: '#d67556'
+            }
+          }
+        },
+        {
+          type: 'effectScatter',
+          coordinateSystem: 'geo',
+          data: portPoints,
+          symbolSize: (val: any[]) => Math.max(8, Math.min(18, (val[2] || 0) / 8)),
+          showEffectOn: 'render',
+          rippleEffect: {
+            brushType: 'stroke',
+            scale: 2.4
+          },
+          itemStyle: {
+            color: '#d67556'
+          },
+          emphasis: {
+            scale: true
+          }
+        }
+      ]
+    });
+
+    const handleMouseOver = (params: any) => {
+      if (params.seriesType === 'scatter') {
+        onCountryHover(params.data.country);
+      } else if (params.seriesType === 'map' && params.name) {
+        onCountryHover(params.name);
+      }
+    };
+
+    const handleGlobalOut = () => {
+      onCountryHover('Singapore');
+    };
+
+    chart.on('mouseover', handleMouseOver);
+    chart.on('globalout', handleGlobalOut);
+
+    const handleResize = () => chart.resize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      chart.off('mouseover', handleMouseOver);
+      chart.off('globalout', handleGlobalOut);
+      chart.dispose();
+      chartRef.current = null;
+    };
+  }, [isDark, onCountryHover]);
+
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+    chart.resize();
+  }, [activeCountry]);
+
+  return <div ref={elRef} className="h-[620px] w-full" />;
+};
+
+const GlobalOverview: React.FC<{ t: (key: string) => string }> = ({ t }) => {
+  const [activeCountry, setActiveCountry] = useState('Singapore');
+  const activeCountryInfo = regionCountries.find((item) => item.name === activeCountry) || regionCountries[0];
+  const activePorts = portPoints.filter((port) => port.country === activeCountry).slice(0, 3);
+
   return (
-    <div className={isDark 
-      ? "bg-gray-800 border border-gray-700 rounded-lg p-4 shadow h-full" 
-      : "bg-white border border-gray-200 rounded-lg p-4 shadow h-full"
-    }>
-      <h3 className="text-lg font-semibold mb-4">{t('geographicDistribution')}</h3>
-      <div className="flex flex-col items-center">
-        <svg 
-          viewBox="0 0 800 400" 
-          className="w-full h-auto"
-          preserveAspectRatio="xMidYMid meet"
-        >
-          {/* 简化的世界地图轮廓 */}
-          <g stroke={isDark ? "#4b5563" : "#d1d5db"} strokeWidth="0.5" fill={isDark ? "#374151" : "#f3f4f6"}>
-            {/* 北美洲 */}
-            <path d="M100,150 L150,130 L200,140 L220,180 L200,220 L150,230 L100,200 Z" />
-            {/* 南美洲 */}
-            <path d="M180,250 L220,270 L200,320 L160,330 L140,280 Z" />
-            {/* 欧洲 */}
-            <path d="M300,120 L350,110 L380,130 L370,160 L330,170 L300,150 Z" />
-            {/* 非洲 */}
-            <path d="M320,200 L380,190 L400,250 L350,280 L300,260 L290,220 Z" />
-            {/* 亚洲 */}
-            <path d="M400,100 L550,80 L600,120 L580,180 L500,200 L420,180 L400,150 Z" />
-            {/* 澳大利亚 */}
-            <path d="M600,280 L650,270 L670,300 L640,320 L600,310 Z" />
-          </g>
-          
-          {/* 根据数据着色国家 */}
-          {countries.map((country, index) => {
-            const intensity = country.value / maxValue;
-            const colorValue = Math.floor(50 + intensity * 200); // 生成颜色值
-            const fillColor = isDark 
-              ? `rgb(${Math.max(0, 200 - colorValue)}, ${Math.min(200, colorValue)}, 100)` 
-              : `rgb(100, ${Math.min(200, colorValue)}, ${Math.max(0, 200 - colorValue)})`;
-            
-            return (
-              <g key={country.id}>
-                {/* 在相应位置显示代表国家的小圆点 */}
-                <circle 
-                  cx={100 + index * 60} 
-                  cy={100 + (index % 3) * 80} 
-                  r={8 + country.value / 10} 
-                  fill={fillColor} 
-                  stroke={isDark ? "#1f2937" : "#ffffff"} 
-                  strokeWidth="1"
-                  title={`${country.name}: ${country.value}`}
-                />
-                <text 
-                  x={100 + index * 60} 
-                  y={100 + (index % 3) * 80 + 25} 
-                  textAnchor="middle" 
-                  fontSize="10" 
-                  fill={isDark ? "#9ca3af" : "#6b7280"}
-                >
-                  {country.name}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-        <div className="mt-4 w-full">
-          <div className="flex justify-between text-xs mb-1">
-            <span>{t('low')}</span>
-            <span>{t('high')}</span>
-          </div>
-          <div className="h-2 w-full bg-gradient-to-r from-blue-400 via-green-400 to-red-500 rounded-full"></div>
+    <div className="workspace-card overflow-hidden p-5">
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <div>
+          <h3 className="workspace-section-title">Global</h3>
+          <p className="workspace-muted mt-1 text-sm">Regional world map with hover states and port activity.</p>
         </div>
+        <div className="workspace-toolbar inline-flex p-1">
+          <button className="workspace-tab workspace-tab-active">Regional</button>
+        </div>
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 1.01, filter: 'blur(4px)' }}
+        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+        transition={{ duration: 0.45, ease: 'easeOut' }}
+        className="overflow-hidden rounded-[28px] border border-app bg-[#fcfcfb]"
+      >
+        <RegionalMap activeCountry={activeCountry} onCountryHover={setActiveCountry} />
+      </motion.div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2 text-xs workspace-muted">
+          <span className="h-2.5 w-2.5 rounded-full bg-[#d67556]" />
+          Active port traffic
+        </div>
+        <div className="flex items-center gap-2 text-xs workspace-muted">
+          <span className="h-2.5 w-2.5 rounded-full bg-[#b98b7d]" />
+          Secondary lanes
+        </div>
+        <div className="ml-auto text-xs workspace-muted">
+          {activeCountryInfo.name} - {activeCountryInfo.value} active routes
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        {activePorts.map((port) => (
+          <div key={port.name} className="workspace-card-subtle px-4 py-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-app">{port.name}</span>
+              <span className="text-xs font-semibold text-app-accent">{port.value[2]} active</span>
+            </div>
+            <p className="mt-1 text-xs workspace-muted">{activeCountryInfo.name}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
 export default function Dash() {
-  const { isDark } = useThemeContext();
+  useThemeContext();
   const { t } = useI18nContext();
-  
-  // 模拟指标数据
+
   const metricsData = [
-    { id: 1, title: t('totalEmailsProcessed'), value: '1,248', change: '+12%', icon: '📧', color: 'blue' },
-    { id: 2, title: t('attachmentsExtracted'), value: '3,421', change: '+8%', icon: '📎', color: 'green' },
-    { id: 3, title: t('dataQualityScore'), value: '96.4%', change: '+2.1%', icon: '📊', color: 'purple' },
-    { id: 4, title: t('processingSuccessRate'), value: '98.7%', change: '+0.3%', icon: '✅', color: 'teal' },
+    { id: 1, title: t('totalEmailsProcessed'), value: '1,248', change: '+12%', icon: '📧' },
+    { id: 2, title: t('attachmentsExtracted'), value: '3,421', change: '+8%', icon: '📎' },
+    { id: 3, title: t('dataQualityScore'), value: '96.4%', change: '+2.1%', icon: '📊' },
+    { id: 4, title: t('processingSuccessRate'), value: '98.7%', change: '+0.3%', icon: '✅' }
   ];
 
-  // 模拟折线图数据 - 邮件处理趋势
   const lineChartData = [
     { day: 'Mon', emails: 120, attachments: 85 },
     { day: 'Tue', emails: 195, attachments: 140 },
@@ -167,29 +295,26 @@ export default function Dash() {
     { day: 'Thu', emails: 210, attachments: 180 },
     { day: 'Fri', emails: 180, attachments: 130 },
     { day: 'Sat', emails: 95, attachments: 60 },
-    { day: 'Sun', emails: 70, attachments: 45 },
+    { day: 'Sun', emails: 70, attachments: 45 }
   ];
 
-  // 模拟柱状图数据 - 不同格式附件数量
   const barChartData = [
     { name: 'PDF', count: 1240 },
     { name: 'Excel', count: 980 },
     { name: 'Word', count: 760 },
     { name: 'CSV', count: 620 },
     { name: 'Image', count: 430 },
-    { name: 'Text', count: 320 },
+    { name: 'Text', count: 320 }
   ];
 
-  // 模拟饼图数据 - 邮件来源分布
   const pieChartData = [
     { name: t('customerInquiries'), value: 400 },
     { name: t('supplierUpdates'), value: 300 },
     { name: t('internalReports'), value: 200 },
     { name: t('financialStatements'), value: 150 },
-    { name: t('hrDocuments'), value: 80 },
+    { name: t('hrDocuments'), value: 80 }
   ];
 
-  // 模拟面积图数据 - 数据质量趋势
   const areaChartData = [
     { week: 'W1', quality: 92 },
     { week: 'W2', quality: 94 },
@@ -197,174 +322,92 @@ export default function Dash() {
     { week: 'W4', quality: 96 },
     { week: 'W5', quality: 94 },
     { week: 'W6', quality: 96 },
-    { week: 'W7', quality: 97 },
+    { week: 'W7', quality: 97 }
   ];
 
   return (
-    <div className={isDark ? "p-4 bg-gray-900 text-gray-100" : "p-4 bg-gray-50 text-gray-900"}>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">{t('dashboard')}</h1>
-        <p className={isDark ? "text-gray-400" : "text-gray-600"}>{t('emailAttachmentProcessingPlatform')}</p>
+    <div className="workspace-page">
+      <div className="mb-8">
+        <GlobalOverview t={t} />
       </div>
 
-      {/* 指标卡片区域 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {metricsData.map(metric => (
-          <MetricCard 
-            key={metric.id}
-            title={metric.title}
-            value={metric.value}
-            change={metric.change}
-            icon={metric.icon}
-            color={metric.color}
-          />
+      <div className="workspace-hero">
+        <h1 className="text-3xl font-semibold text-app">{t('dashboard')}</h1>
+        <p className="mt-2 workspace-muted">{t('emailAttachmentProcessingPlatform')}</p>
+      </div>
+
+      <div className="mb-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+        {metricsData.map((metric) => (
+          <MetricCard key={metric.id} title={metric.title} value={metric.value} change={metric.change} icon={metric.icon} />
         ))}
       </div>
 
-      {/* 图表区域 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* 折线图 - 邮件处理趋势 */}
-        <div className={isDark 
-          ? "bg-gray-800 border border-gray-700 rounded-lg p-4 shadow" 
-          : "bg-white border border-gray-200 rounded-lg p-4 shadow"
-        }>
-          <h3 className="text-lg font-semibold mb-4">{t('emailProcessingTrend')}</h3>
+      <div className="mb-8 grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div className="workspace-card p-5">
+          <h3 className="workspace-section-title mb-4">{t('emailProcessingTrend')}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={lineChartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#4b5563" : "#e5e7eb"} />
-              <XAxis dataKey="day" stroke={isDark ? "#9ca3af" : "#6b7280"} />
-              <YAxis stroke={isDark ? "#9ca3af" : "#6b7280"} />
-              <Tooltip 
-                contentStyle={isDark 
-                  ? { backgroundColor: '#374151', borderColor: '#4b5563' } 
-                  : { backgroundColor: 'white', borderColor: '#e5e7eb' }
-                } 
-              />
-              <Line 
-                type="monotone" 
-                dataKey="emails" 
-                stroke="#3b82f6" 
-                strokeWidth={2} 
-                activeDot={{ r: 8 }} 
-              />
-              <Line 
-                type="monotone" 
-                dataKey="attachments" 
-                stroke="#10b981" 
-                strokeWidth={2} 
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(214,117,86,0.10)" />
+              <XAxis dataKey="day" stroke="#8f867f" />
+              <YAxis stroke="#8f867f" />
+              <Tooltip contentStyle={{ backgroundColor: '#fcfcfb', borderColor: 'rgba(102,92,84,0.12)', borderRadius: '14px' }} />
+              <Line type="monotone" dataKey="emails" stroke="#d67556" strokeWidth={2.2} activeDot={{ r: 6, fill: '#d67556' }} />
+              <Line type="monotone" dataKey="attachments" stroke="#8f867f" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        {/* 柱状图 - 附件格式分布 */}
-        <div className={isDark 
-          ? "bg-gray-800 border border-gray-700 rounded-lg p-4 shadow" 
-          : "bg-white border border-gray-200 rounded-lg p-4 shadow"
-        }>
-          <h3 className="text-lg font-semibold mb-4">{t('attachmentFormatDistribution')}</h3>
+        <div className="workspace-card p-5">
+          <h3 className="workspace-section-title mb-4">{t('attachmentFormatDistribution')}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={barChartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#4b5563" : "#e5e7eb"} />
-              <XAxis dataKey="name" stroke={isDark ? "#9ca3af" : "#6b7280"} />
-              <YAxis stroke={isDark ? "#9ca3af" : "#6b7280"} />
-              <Tooltip 
-                contentStyle={isDark 
-                  ? { backgroundColor: '#374151', borderColor: '#4b5563' } 
-                  : { backgroundColor: 'white', borderColor: '#e5e7eb' }
-                } 
-              />
-              <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(214,117,86,0.10)" />
+              <XAxis dataKey="name" stroke="#8f867f" />
+              <YAxis stroke="#8f867f" />
+              <Tooltip contentStyle={{ backgroundColor: '#fcfcfb', borderColor: 'rgba(102,92,84,0.12)', borderRadius: '14px' }} />
+              <Bar dataKey="count" fill="#d67556" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* 饼图 - 邮件来源分布 */}
-        <div className={isDark 
-          ? "bg-gray-800 border border-gray-700 rounded-lg p-4 shadow" 
-          : "bg-white border border-gray-200 rounded-lg p-4 shadow"
-        }>
-          <h3 className="text-lg font-semibold mb-4">{t('emailSourceDistribution')}</h3>
+      <div className="mb-8 grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <div className="workspace-card p-5">
+          <h3 className="workspace-section-title mb-4">{t('emailSourceDistribution')}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie
-                data={pieChartData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-              >
-                {pieChartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              <Pie data={pieChartData} cx="50%" cy="50%" labelLine={false} outerRadius={84} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                {pieChartData.map((_, index) => (
+                  <Cell key={index} fill={chartPalette[index % chartPalette.length]} />
                 ))}
               </Pie>
-              <Tooltip 
-                contentStyle={isDark 
-                  ? { backgroundColor: '#374151', borderColor: '#4b5563' } 
-                  : { backgroundColor: 'white', borderColor: '#e5e7eb' }
-                } 
-              />
+              <Tooltip contentStyle={{ backgroundColor: '#fcfcfb', borderColor: 'rgba(102,92,84,0.12)', borderRadius: '14px' }} />
             </PieChart>
           </ResponsiveContainer>
         </div>
 
-        {/* 面积图 - 数据质量趋势 */}
-        <div className={isDark 
-          ? "bg-gray-800 border border-gray-700 rounded-lg p-4 shadow" 
-          : "bg-white border border-gray-200 rounded-lg p-4 shadow"
-        }>
-          <h3 className="text-lg font-semibold mb-4">{t('dataQualityTrend')}</h3>
+        <div className="workspace-card p-5">
+          <h3 className="workspace-section-title mb-4">{t('dataQualityTrend')}</h3>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={areaChartData}>
               <defs>
                 <linearGradient id="colorQuality" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
+                  <stop offset="5%" stopColor="#d67556" stopOpacity={0.35} />
+                  <stop offset="95%" stopColor="#d67556" stopOpacity={0.04} />
                 </linearGradient>
               </defs>
-              <XAxis dataKey="week" stroke={isDark ? "#9ca3af" : "#6b7280"} />
-              <YAxis stroke={isDark ? "#9ca3af" : "#6b7280"} domain={[90, 100]} />
-              <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#4b5563" : "#e5e7eb"} />
-              <Tooltip 
-                contentStyle={isDark 
-                  ? { backgroundColor: '#374151', borderColor: '#4b5563' } 
-                  : { backgroundColor: 'white', borderColor: '#e5e7eb' }
-                } 
-              />
-              <Area 
-                type="monotone" 
-                dataKey="quality" 
-                stroke="#10b981" 
-                fillOpacity={1} 
-                fill="url(#colorQuality)" 
-              />
+              <XAxis dataKey="week" stroke="#8f867f" />
+              <YAxis stroke="#8f867f" domain={[90, 100]} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(214,117,86,0.10)" />
+              <Tooltip contentStyle={{ backgroundColor: '#fcfcfb', borderColor: 'rgba(102,92,84,0.12)', borderRadius: '14px' }} />
+              <Area type="monotone" dataKey="quality" stroke="#d67556" fillOpacity={1} fill="url(#colorQuality)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
       </div>
 
-      {/* 地图区域 */}
-        <div className="grid grid-cols-1 gap-6 mb-8">
-          <WorldMap data={[
-            { country: 'USA', value: 120, color: '#ef4444' },
-            { country: 'CHN', value: 95, color: '#3b82f6' },
-            { country: 'DEU', value: 75, color: '#10b981' },
-            { country: 'JPN', value: 68, color: '#f59e0b' },
-            { country: 'GBR', value: 55, color: '#8b5cf6' },
-          ]} t={t} />
-        </div>
-
-      {/* 底部操作按钮 */}
       <div className="flex justify-end">
-        <Link 
-          to="/workbench" 
-          className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-        >
+        <Link to="/workbench" className="workspace-button-primary">
           {t('viewDetailedReport')}
         </Link>
       </div>

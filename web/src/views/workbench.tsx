@@ -586,58 +586,33 @@ const Workbench: React.FC = () => {
 
 
   return (
-    <div className={isDark ? "p-6 bg-gray-900 text-gray-100 min-h-screen" : "p-6 bg-gray-50 text-gray-900 min-h-screen"}>
-      <div className="max-w-8xl mx-auto">
-        <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold">{t('GeekAILab')}</h1>
-          <p className={isDark ? "text-gray-400" : "text-gray-600"}>{t('AnylysisWorkbench')}</p>
+    <div className="workspace-page">
+      <div className="mx-auto max-w-[1480px]">
+        <div className="workspace-hero text-center">
+          <h1 className="text-3xl font-semibold text-app">{t('GeekAILab')}</h1>
+          <p className="mt-2 workspace-muted">{t('AnylysisWorkbench')}</p>
         </div>
 
         {/* 顶部Tab导航 */}
         <div className="flex justify-center mb-6">
-          <div className={cn("inline-flex rounded-md shadow-sm",
-            isDark
-              ? "bg-gray-800"
-              : "bg-white"
-          )}>
+          <div className="workspace-toolbar inline-flex p-1">
             <button
               type="button"
-              className={`px-4 py-2 text-sm font-medium rounded-l-lg ${activeTab === 'inbox'
-                ? (isDark
-                  ? 'bg-blue-600 text-white border border-blue-600'
-                  : 'bg-blue-100 text-blue-700 border border-blue-300')
-                : (isDark
-                  ? 'text-gray-300 hover:bg-gray-700'
-                  : 'text-gray-700 hover:bg-gray-100')
-                }`}
+              className={`workspace-tab ${activeTab === 'inbox' ? 'workspace-tab-active' : ''}`}
               onClick={() => setActiveTab('inbox')}
             >
               {t('inbox')}
             </button>
             <button
               type="button"
-              className={`px-4 py-2 text-sm font-medium ${activeTab === 'richText'
-                ? (isDark
-                  ? 'bg-blue-600 text-white border border-blue-600'
-                  : 'bg-blue-100 text-blue-700 border border-blue-300')
-                : (isDark
-                  ? 'text-gray-300 hover:bg-gray-700'
-                  : 'text-gray-700 hover:bg-gray-100')
-                }`}
+              className={`workspace-tab ${activeTab === 'richText' ? 'workspace-tab-active' : ''}`}
               onClick={() => setActiveTab('richText')}
             >
               {t('richText')}
             </button>
             <button
               type="button"
-              className={`px-4 py-2 text-sm font-medium rounded-r-lg ${activeTab === 'ocr'
-                ? (isDark
-                  ? 'bg-blue-600 text-white border border-blue-600'
-                  : 'bg-blue-100 text-blue-700 border border-blue-300')
-                : (isDark
-                  ? 'text-gray-300 hover:bg-gray-700'
-                  : 'text-gray-700 hover:bg-gray-100')
-                }`}
+              className={`workspace-tab ${activeTab === 'ocr' ? 'workspace-tab-active' : ''}`}
               onClick={() => setActiveTab('ocr')}
             >
               {t('OCR')}
@@ -650,11 +625,7 @@ const Workbench: React.FC = () => {
           <button
             onClick={parseContent}
             disabled={isParsing}
-            className={cn("px-4 py-2 text-sm rounded-md flex items-center",
-              isDark
-                ? "bg-blue-600 hover:bg-blue-700 text-white"
-                : "bg-blue-500 hover:bg-blue-600 text-white"
-            )}
+            className="workspace-button-primary"
           >
             {isParsing ? (
               <>
@@ -671,11 +642,7 @@ const Workbench: React.FC = () => {
 
           <button
             onClick={resetResults}
-            className={cn("px-4 py-2 text-sm rounded-md flex items-center",
-              isDark
-                ? "bg-gray-600 hover:bg-gray-700 text-white"
-                : "bg-gray-300 hover:bg-gray-400 text-gray-800"
-            )}
+            className="workspace-button-secondary"
           >
             <RotateCcw size={14} className="mr-2" />
             {t('reset')}
@@ -687,11 +654,7 @@ const Workbench: React.FC = () => {
         {/* 主工作区 */}
         <div className={`grid grid-cols-1 ${activeTab === 'inbox' ? 'lg:grid-cols-2' : 'lg:grid-cols-2'} gap-4 h-[calc(100vh-280px)]`}>
           {/* 左侧区域 */}
-          <div className={cn("rounded-lg border shadow-sm overflow-hidden flex flex-col",
-            isDark
-              ? "bg-gray-800 border-gray-700"
-              : "bg-white border-gray-200"
-          )}>
+          <div className="workspace-card overflow-hidden flex flex-col">
 
 
             {activeTab === 'inbox' && (
@@ -766,11 +729,7 @@ const Workbench: React.FC = () => {
                 </div>
 
                 {/* 邮件详情 */}
-                <div className={cn("w-2/3 rounded-lg border shadow-sm overflow-hidden flex flex-col",
-                  isDark
-                    ? "bg-gray-800 border-gray-700"
-                    : "bg-white border-gray-200"
-                )}>
+                <div className="workspace-card-subtle w-2/3 overflow-hidden flex flex-col">
                   <div className={cn("p-4 border-b",
                     isDark
                       ? "border-gray-700 bg-gray-750"
@@ -954,11 +913,7 @@ const Workbench: React.FC = () => {
                 </div>
 
                 {/* 右侧预览面板 */}
-                <div className={cn("w-2/3 rounded-lg border shadow-sm overflow-hidden flex flex-col",
-                  isDark
-                    ? "bg-gray-800 border-gray-700"
-                    : "bg-white border-gray-200"
-                )}>
+                <div className="workspace-card-subtle w-2/3 overflow-hidden flex flex-col">
                   <div className={cn("p-4 border-b",
                     isDark
                       ? "border-gray-700 bg-gray-750"
@@ -1026,11 +981,7 @@ const Workbench: React.FC = () => {
 
 
           {/* 右侧解析结果区 */}
-          <div className={cn("rounded-lg border shadow-sm overflow-hidden flex flex-col",
-            isDark
-              ? "bg-gray-800 border-gray-700"
-              : "bg-white border-gray-200"
-          )}>
+          <div className="workspace-card overflow-hidden flex flex-col">
             <div className={cn("p-4 border-b flex justify-between items-center",
               isDark
                 ? "border-gray-700 bg-gray-750"

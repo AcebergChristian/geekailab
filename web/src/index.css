@@ -3,42 +3,609 @@
 @tailwind utilities;
 
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  font-family: "SF Pro Display", "SF Pro Text", "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --accent: #d67556;
+  --accent-strong: #c96547;
+  --accent-soft: rgba(214, 117, 86, 0.14);
+  --accent-border: rgba(214, 117, 86, 0.26);
+  --bg: #f7f4ef;
+  --bg-elevated: rgba(255, 255, 255, 0.84);
+  --bg-panel: rgba(255, 255, 255, 0.92);
+  --bg-muted: #f0e9e0;
+  --text: #1c1816;
+  --text-soft: #645a54;
+  --text-faint: #92867d;
+  --border: rgba(123, 105, 93, 0.14);
+  --border-strong: rgba(123, 105, 93, 0.22);
+  --shadow: 0 4px 14px rgba(37, 26, 18, 0.04);
+  --hero-glow: rgba(214, 117, 86, 0.18);
+  color: var(--text);
+  background: #f7f4ef;
 }
 
-/* 暗色模式自定义颜色 */
 .dark {
-  @apply bg-gray-900 text-gray-100;
+  --accent: #d67556;
+  --accent-strong: #e08a6f;
+  --accent-soft: rgba(214, 117, 86, 0.16);
+  --accent-border: rgba(214, 117, 86, 0.36);
+  --bg: #171717;
+  --bg-elevated: rgba(28, 28, 28, 0.86);
+  --bg-panel: rgba(24, 24, 24, 0.94);
+  --bg-muted: #202020;
+  --text: #f3efe9;
+  --text-soft: #aea59d;
+  --text-faint: #7e7770;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+  --hero-glow: rgba(214, 117, 86, 0.24);
+  color: var(--text);
+  background: #171717;
 }
 
-/* 暗色模式下的滚动条 */
-.dark ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+html {
+  scroll-behavior: smooth;
 }
 
-.dark ::-webkit-scrollbar-track {
-  background: #1f2937;
+body {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(133, 110, 96, 0.28);
+  border-radius: 999px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #4b5563;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.16);
 }
 
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(214, 117, 86, 0.42);
 }
 
-/* 定义一个暗色模式的深灰色背景，用于表格头部等元素 */
 .bg-gray-750 {
   background-color: #1f2937;
 }
 
+@layer utilities {
+  .text-app {
+    color: var(--text);
+  }
+
+  .text-app-soft {
+    color: var(--text-soft);
+  }
+
+  .text-app-faint {
+    color: var(--text-faint);
+  }
+
+  .border-app {
+    border-color: var(--border);
+  }
+
+  .border-app-strong {
+    border-color: var(--border-strong);
+  }
+
+  .bg-app {
+    background: var(--bg);
+  }
+
+  .bg-app-muted {
+    background: var(--bg-muted);
+  }
+
+  .bg-app-panel {
+    background: var(--bg-panel);
+  }
+
+  .bg-app-elevated {
+    background: var(--bg-elevated);
+  }
+
+  .bg-app-accent {
+    background: var(--accent);
+  }
+
+  .text-app-accent {
+    color: var(--accent);
+  }
+
+  .ring-app-accent {
+    --tw-ring-color: rgba(214, 117, 86, 0.18);
+  }
+}
+
+@layer components {
+  .app-shell {
+    @apply min-h-screen text-app;
+    background: var(--bg);
+  }
+
+  .app-topbar {
+    @apply sticky top-3 z-50 mx-3 border backdrop-blur-xl;
+    background: color-mix(in srgb, var(--bg-panel) 92%, transparent);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .app-panel {
+    @apply border;
+    background: var(--bg-panel);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .app-elevated {
+    @apply border;
+    background: var(--bg-elevated);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .app-card {
+    @apply rounded-3xl border;
+    background: var(--bg-panel);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .app-card-muted {
+    @apply rounded-3xl border;
+    background: color-mix(in srgb, var(--bg-muted) 78%, transparent);
+    border-color: var(--border);
+  }
+
+  .app-accent-chip {
+    @apply inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em];
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-color: var(--accent-border);
+  }
+
+  .app-nav-link {
+    @apply relative rounded-full px-4 py-2 text-sm font-medium;
+    color: var(--text-soft);
+  }
+
+  .app-nav-link:hover {
+    @apply text-app;
+    background: color-mix(in srgb, var(--bg-muted) 70%, transparent);
+  }
+
+  .app-nav-link-active {
+    @apply text-app;
+    background: var(--accent-soft);
+    box-shadow: inset 0 0 0 1px var(--accent-border);
+  }
+
+  .app-button-primary {
+    @apply inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold text-white;
+    background: var(--accent);
+    box-shadow: none;
+  }
+
+  .app-button-primary:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .app-button-secondary {
+    @apply inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold;
+    color: var(--text);
+    background: color-mix(in srgb, var(--bg-muted) 74%, transparent);
+    border: 1px solid var(--border-strong);
+  }
+
+  .app-button-secondary:hover {
+    background: color-mix(in srgb, var(--accent-soft) 72%, var(--bg-muted) 28%);
+    border-color: var(--accent-border);
+  }
+
+  .app-button-ghost {
+    @apply inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold;
+    color: var(--accent);
+    background: transparent;
+    border: 1px solid var(--accent-border);
+  }
+
+  .app-button-ghost:hover {
+    background: var(--accent-soft);
+  }
+
+  .app-input {
+    @apply w-full rounded-2xl border px-4 py-3 outline-none;
+    color: var(--text);
+    background: color-mix(in srgb, var(--bg-muted) 62%, transparent);
+    border-color: var(--border);
+  }
+
+  .app-input::placeholder {
+    color: var(--text-faint);
+  }
+
+  .app-input:focus {
+    border-color: var(--accent-border);
+    box-shadow: 0 0 0 4px rgba(214, 117, 86, 0.12);
+  }
+
+  .app-doc-sidebar {
+    @apply border backdrop-blur-xl;
+    background: color-mix(in srgb, var(--bg-panel) 90%, transparent);
+    border-color: var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .app-doc-link {
+    @apply flex w-full items-center rounded-2xl px-3 py-2 text-left text-sm;
+    color: var(--text-soft);
+  }
+
+  .app-doc-link:hover {
+    @apply text-app;
+    background: color-mix(in srgb, var(--bg-muted) 74%, transparent);
+  }
+
+  .app-doc-link-active {
+    @apply text-app;
+    background: var(--accent-soft);
+    box-shadow: inset 0 0 0 1px var(--accent-border);
+  }
+
+  .app-code-block {
+    @apply overflow-x-auto rounded-3xl border p-5 text-sm;
+    color: color-mix(in srgb, var(--text) 88%, white 12%);
+    background: color-mix(in srgb, var(--bg-muted) 58%, transparent);
+    border-color: var(--border);
+  }
+
+  .workspace-shell {
+    @apply min-h-screen;
+    background: #fcfcfb;
+    color: #201c19;
+  }
+
+  .workspace-sidebar {
+    @apply border-r;
+    background: #f7f7f4;
+    border-color: rgba(102, 92, 84, 0.12);
+  }
+
+  .workspace-sidebar-title {
+    @apply text-sm font-semibold uppercase tracking-[0.18em];
+    color: #8b8179;
+  }
+
+  .workspace-nav-item {
+    @apply flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium;
+    color: #6d645d;
+  }
+
+  .workspace-nav-item:hover {
+    color: #1f1b18;
+    background: #efeeea;
+  }
+
+  .workspace-nav-item-active {
+    color: #1f1b18;
+    background: #f3eee9;
+    box-shadow: inset 0 0 0 1px rgba(214, 117, 86, 0.22);
+  }
+
+  .workspace-main {
+    @apply min-h-screen;
+    background: #fcfcfb;
+  }
+
+  .workspace-page {
+    @apply mx-auto max-w-[1440px] p-6 md:p-8;
+  }
+
+  .workspace-hero {
+    @apply mb-6 rounded-[28px] border px-8 py-4;
+    background: #fcfcfb;
+    border-color: rgba(102, 92, 84, 0.12);
+  }
+
+  .workspace-card {
+    @apply rounded-[24px] border;
+    background: #fcfcfb;
+    border-color: rgba(102, 92, 84, 0.12);
+    box-shadow: none;
+  }
+
+  .workspace-card-subtle {
+    @apply rounded-[20px] border;
+    background: #f8f7f4;
+    border-color: rgba(102, 92, 84, 0.1);
+  }
+
+  .workspace-toolbar {
+    @apply rounded-2xl border;
+    background: #fcfcfb;
+    border-color: rgba(102, 92, 84, 0.12);
+  }
+
+  .workspace-tab {
+    @apply rounded-xl px-4 py-2 text-sm font-medium;
+    color: #6d645d;
+  }
+
+  .workspace-tab:hover {
+    color: #1f1b18;
+    background: #f4f1ed;
+  }
+
+  .workspace-tab-active {
+    color: #1f1b18;
+    background: rgba(214, 117, 86, 0.16);
+    box-shadow: inset 0 0 0 1px rgba(214, 117, 86, 0.28);
+  }
+
+  .workspace-button-primary {
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold text-white;
+    background: var(--accent);
+  }
+
+  .workspace-button-secondary {
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium;
+    color: #4f4741;
+    background: #f4f2ee;
+    border: 1px solid rgba(102, 92, 84, 0.12);
+  }
+
+  .workspace-section-title {
+    @apply text-lg font-semibold;
+    color: #1f1b18;
+  }
+
+  .workspace-muted {
+    color: #847972;
+  }
+
+  .dark .workspace-shell {
+    background: #171717;
+    color: #f3efe9;
+  }
+
+  .dark .workspace-sidebar {
+    background: #0f0f0f;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .dark .workspace-nav-item {
+    color: #a79f97;
+  }
+
+  .dark .workspace-nav-item:hover {
+    color: #f3efe9;
+    background: #1b1b1b;
+  }
+
+  .dark .workspace-nav-item-active {
+    color: #f3efe9;
+    background: #1e1e1e;
+  }
+
+  .dark .workspace-main {
+    background: #171717;
+  }
+
+  .dark .workspace-hero {
+    background: #1b1b1b;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .dark .workspace-card {
+    background: #1b1b1b;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .dark .workspace-card-subtle {
+    background: #202020;
+    border-color: rgba(255, 255, 255, 0.07);
+  }
+
+  .dark .workspace-toolbar {
+    background: #1b1b1b;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .dark .workspace-tab {
+    color: #a79f97;
+  }
+
+  .dark .workspace-tab:hover {
+    color: #f3efe9;
+    background: #252525;
+  }
+
+  .dark .workspace-tab-active {
+    color: #f3efe9;
+  }
+
+  .dark .workspace-button-secondary {
+    color: #d1cbc4;
+    background: #252525;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .dark .workspace-section-title {
+    color: #f3efe9;
+  }
+
+  .dark .workspace-muted {
+    color: #9b938c;
+  }
+}
+
+.workspace-main .bg-white,
+.workspace-main .bg-gray-50 {
+  background-color: #fcfcfb !important;
+}
+
+.workspace-main .bg-gray-100 {
+  background-color: #f5f3ef !important;
+}
+
+.workspace-main .border-gray-200 {
+  border-color: rgba(102, 92, 84, 0.12) !important;
+}
+
+.workspace-main .text-gray-900 {
+  color: #1f1b18 !important;
+}
+
+.workspace-main .text-gray-800 {
+  color: #302925 !important;
+}
+
+.workspace-main .text-gray-700,
+.workspace-main .text-gray-600,
+.workspace-main .text-gray-500,
+.workspace-main .text-gray-400 {
+  color: #7a6f67 !important;
+}
+
+.dark .workspace-main .bg-gray-800,
+.dark .workspace-main .bg-gray-750,
+.dark .workspace-main .bg-gray-900,
+.dark .workspace-main .bg-white,
+.dark .workspace-main .bg-gray-50 {
+  background-color: #1b1b1b !important;
+}
+
+.dark .workspace-main .bg-gray-700,
+.dark .workspace-main .bg-gray-900\/30,
+.dark .workspace-main .bg-gray-900\/50 {
+  background-color: #202020 !important;
+}
+
+.dark .workspace-main .border-gray-700,
+.dark .workspace-main .divide-gray-700 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Legacy accent remap for older component classes that still exist in the repo */
+.text-purple-300,
+.text-purple-400,
+.text-purple-500,
+.text-blue-300,
+.text-blue-400,
+.text-blue-500,
+.text-blue-600,
+.text-blue-700,
+.text-blue-800,
+.text-emerald-500,
+.text-emerald-600,
+.text-emerald-700,
+.text-emerald-800 {
+  color: var(--accent) !important;
+}
+
+.bg-purple-500,
+.bg-purple-600,
+.bg-blue-50,
+.bg-blue-500,
+.bg-blue-600,
+.bg-emerald-500 {
+  background-color: var(--accent) !important;
+}
+
+.border-purple-400,
+.border-purple-500,
+.border-blue-200,
+.border-blue-300,
+.border-blue-600,
+.border-emerald-400,
+.border-emerald-500,
+.hover\:border-purple-500\/50:hover,
+.hover\:border-emerald-400\/50:hover {
+  border-color: var(--accent-border) !important;
+}
+
+.bg-purple-900\/20,
+.bg-purple-900\/30,
+.bg-purple-900\/50,
+.bg-blue-900\/20,
+.bg-emerald-50,
+.bg-emerald-100,
+.bg-emerald-500\/10,
+.bg-purple-500\/20 {
+  background-color: var(--accent-soft) !important;
+}
+
+.hover\:bg-purple-500\/10:hover,
+.hover\:bg-emerald-50:hover {
+  background-color: var(--accent-soft) !important;
+}
+
+.hover\:text-purple-300:hover,
+.hover\:text-purple-200:hover,
+.hover\:text-blue-300:hover,
+.hover\:text-blue-500:hover,
+.hover\:text-emerald-800:hover,
+.hover\:text-emerald-600:hover {
+  color: var(--accent) !important;
+}
+
+.hover\:shadow-purple-500\/10:hover,
+.hover\:shadow-emerald-300\/20:hover {
+  --tw-shadow-color: rgba(214, 117, 86, 0.18) !important;
+  --tw-shadow: 0 18px 40px var(--tw-shadow-color) !important;
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
+}
+
+.globe-spin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: globe-spin 28s linear infinite;
+}
+
+@keyframes globe-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

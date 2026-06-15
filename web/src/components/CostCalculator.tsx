@@ -232,7 +232,7 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
             }`}
           >
             <div className="flex items-center mb-6">
-              <BarChart3 className={`h-6 w-6 mr-2 ${isDark ? 'text-purple-400' : 'text-emerald-500'}`} />
+              <BarChart3 className="mr-2 h-6 w-6 text-app-accent" />
               <h3 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('标准版本成本计算器')}</h3>
             </div>
             
@@ -251,7 +251,8 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
                     onChange={(e) => setMonthlyEmails(parseInt(e.target.value))}
                     className={`w-full h-2 ${
                       isDark ? 'bg-gray-700' : 'bg-gray-200'
-                    } rounded-lg appearance-none cursor-pointer accent-${isDark ? 'purple-500' : 'emerald-500'}`}
+                    } rounded-lg appearance-none cursor-pointer`}
+                    style={{ accentColor: '#d67556' }}
                   />
                   <input
                     type="number"
@@ -301,9 +302,7 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
                       value="high"
                       checked={usageFrequency === 'high'}
                       onChange={(e) => setUsageFrequency(e.target.value as 'high' | 'medium' | 'low')}
-                      className={`h-4 w-4 ${
-                        isDark ? 'text-purple-500' : 'text-emerald-500'
-                      }`}
+                      className="h-4 w-4 text-app-accent"
                     />
                     <span className={`ml-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t('高频（每天）')}</span>
                   </label>
@@ -314,9 +313,7 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
                       value="medium"
                       checked={usageFrequency === 'medium'}
                       onChange={(e) => setUsageFrequency(e.target.value as 'high' | 'medium' | 'low')}
-                      className={`h-4 w-4 ${
-                        isDark ? 'text-purple-500' : 'text-emerald-500'
-                      }`}
+                      className="h-4 w-4 text-app-accent"
                     />
                     <span className={`ml-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t('中频（每周）')}</span>
                   </label>
@@ -327,9 +324,7 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
                       value="low"
                       checked={usageFrequency === 'low'}
                       onChange={(e) => setUsageFrequency(e.target.value as 'high' | 'medium' | 'low')}
-                      className={`h-4 w-4 ${
-                        isDark ? 'text-purple-500' : 'text-emerald-500'
-                      }`}
+                      className="h-4 w-4 text-app-accent"
                     />
                     <span className={`ml-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>{t('低频（每月）')}</span>
                   </label>
@@ -343,9 +338,7 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
               <div>
                 <h4 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('预计每月成本')}</h4>
                 <div className="flex items-baseline mb-6">
-                  <span className={`text-4xl font-bold mr-1 ${
-                    isDark ? 'text-purple-400' : 'text-emerald-500'
-                  }`}>¥</span>
+                  <span className="mr-1 text-4xl font-bold text-app-accent">¥</span>
                   <span className={`text-5xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     {totalCost.toFixed(2)}
                   </span>
@@ -370,9 +363,7 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
                   </div>
                 </div>
                 
-                <div className={`mt-6 p-3 rounded-lg text-sm flex items-start ${
-                  isDark ? 'bg-purple-900/30 text-purple-300' : 'bg-emerald-50 text-emerald-800'
-                }`}>
+                <div className="mt-6 flex items-start rounded-lg bg-[var(--accent-soft)] p-3 text-sm text-app-accent">
                   <CheckCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
                   <p>{t('仅对成功识别并结构化输出的运价条数计费，失败解析、空结果不计费')}</p>
                 </div>
@@ -393,7 +384,7 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
             }`}
           >
             <div className="flex items-center mb-6">
-              <Building className={`h-6 w-6 mr-2 ${isDark ? 'text-purple-400' : 'text-emerald-500'}`} />
+              <Building className="mr-2 h-6 w-6 text-app-accent" />
               <h3 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('企业级接入方案评估器')}</h3>
             </div>
             
@@ -411,8 +402,8 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
                       className={`py-3 px-4 rounded-md border transition-all ${
                         dailyEmails === range
                           ? (isDark 
-                            ? 'bg-purple-500/20 border-purple-400 text-purple-300' 
-                            : 'bg-emerald-500/10 border-emerald-400 text-emerald-700')
+                            ? 'bg-[var(--accent-soft)] border-[color:var(--accent-border)] text-app-accent' 
+                            : 'bg-gray-50 border-gray-200 text-gray-700 dark:bg-gray-700/50 dark:border-gray-600 dark:text-gray-300')
                           : (isDark 
                             ? 'bg-gray-700/50 border-gray-600 text-gray-300 hover:bg-gray-700' 
                             : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100')
@@ -437,9 +428,7 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
                       value="true"
                       checked={autoPush}
                       onChange={(e) => setAutoPush(e.target.value === 'true')}
-                      className={`h-4 w-4 ${
-                        isDark ? 'text-purple-500' : 'text-emerald-500'
-                      }`}
+                      className="h-4 w-4 text-app-accent"
                     />
                     <span className={`ml-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>是</span>
                   </label>
@@ -451,9 +440,7 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
                       value="false"
                       checked={!autoPush}
                       onChange={(e) => setAutoPush(e.target.value === 'true')}
-                      className={`h-4 w-4 ${
-                        isDark ? 'text-purple-500' : 'text-emerald-500'
-                      }`}
+                      className="h-4 w-4 text-app-accent"
                     />
                     <span className={`ml-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>否</span>
                   </label>
@@ -473,9 +460,7 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
                       value="true"
                       checked={historyStorage}
                       onChange={(e) => setHistoryStorage(e.target.value === 'true')}
-                      className={`h-4 w-4 ${
-                        isDark ? 'text-purple-500' : 'text-emerald-500'
-                      }`}
+                      className="h-4 w-4 text-app-accent"
                     />
                     <span className={`ml-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>是</span>
                   </label>
@@ -486,9 +471,7 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
                       value="false"
                       checked={!historyStorage}
                       onChange={(e) => setHistoryStorage(e.target.value === 'true')}
-                      className={`h-4 w-4 ${
-                        isDark ? 'text-purple-500' : 'text-emerald-500'
-                      }`}
+                      className="h-4 w-4 text-app-accent"
                     />
                     <span className={`ml-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>否</span>
                   </label>
@@ -502,17 +485,13 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
               <div>
                 <div className="mb-4">
                   <h4 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('复杂度评级')}</h4>
-                  <p className={`text-2xl font-bold ${
-                    isDark ? 'text-purple-400' : 'text-emerald-600'
-                  }`}>{enterprisePlan}</p>
+                  <p className="text-2xl font-bold text-app-accent">{enterprisePlan}</p>
                 </div>
                 
                 <div className="mb-6">
                   <h4 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>{t('参考投入区间')}</h4>
                   <div className="flex items-baseline">
-                    <DollarSign className={`h-5 w-5 mr-1 ${
-                      isDark ? 'text-purple-400' : 'text-emerald-600'
-                    }`} />
+                    <DollarSign className="mr-1 h-5 w-5 text-app-accent" />
                     <span className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                       {enterpriseCostRange}
                     </span>
@@ -551,11 +530,7 @@ const CostCalculator: React.FC<CostCalculatorProps> = ({ language }) => {
                 
                 <button
                   onClick={handleGetEnterpriseSuggestion}
-                  className={`w-full py-3 px-6 rounded-md font-semibold flex items-center justify-center transition-colors ${
-                    isDark 
-                      ? 'bg-purple-500 hover:bg-purple-600 text-white' 
-                      : 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                  }`}
+                  className="app-button-primary w-full justify-center rounded-md px-6 py-3"
                 >
                   {t('获取接入方案建议（2分钟）')}
                   <ArrowRight className="ml-2 h-5 w-5" />

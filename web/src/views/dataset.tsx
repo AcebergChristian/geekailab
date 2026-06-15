@@ -91,23 +91,23 @@ const Dataset: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen ${isDark ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'} p-6`}>
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">数据集管理</h1>
-          <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+    <div className="workspace-page">
+      <div className="mx-auto max-w-7xl">
+        <div className="workspace-hero">
+          <h1 className="mb-2 text-3xl font-semibold text-app">数据集管理</h1>
+          <p className="workspace-muted">
             展示我们能够解析的各种非结构化数据类型，特别是船货运运价相关文档
           </p>
         </div>
 
         {/* 数据类型筛选 */}
-        <div className={`mb-6 p-4 rounded-lg ${isDark ? 'bg-gray-800' : 'bg-white'} shadow`}>
+        <div className="workspace-toolbar mb-6 p-4">
           <div className="flex flex-wrap gap-3">
             <button
-              className={`px-4 py-2 rounded-full text-sm font-medium ${
+              className={`rounded-full px-4 py-2 text-sm font-medium ${
                 selectedDataType === 'all'
-                  ? (isDark ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white')
-                  : (isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-700')
+                  ? 'bg-app-accent text-white'
+                  : 'workspace-button-secondary'
               }`}
               onClick={() => setSelectedDataType('all')}
             >
@@ -118,10 +118,10 @@ const Dataset: React.FC = () => {
               return (
                 <button
                   key={type}
-                  className={`px-4 py-2 rounded-full text-sm font-medium ${
+                  className={`rounded-full px-4 py-2 text-sm font-medium ${
                     selectedDataType === type
-                      ? (isDark ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white')
-                      : (isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-200 text-gray-700')
+                      ? 'bg-app-accent text-white'
+                      : 'workspace-button-secondary'
                   }`}
                   onClick={() => setSelectedDataType(type)}
                 >
@@ -137,16 +137,16 @@ const Dataset: React.FC = () => {
           {filteredDataTypes.map((dataType) => (
             <div
               key={dataType.id}
-              className={`rounded-lg border ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'} shadow p-5`}
+              className="workspace-card p-5"
             >
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <h3 className="font-semibold text-lg">{dataType.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className={`text-xs px-2 py-1 rounded-full ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                    <span className="rounded-full bg-app-muted px-2 py-1 text-xs">
                       {dataType.type}
                     </span>
-                    <span className={`text-xs px-2 py-1 rounded-full ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                    <span className="rounded-full bg-app-muted px-2 py-1 text-xs">
                       {dataType.size}
                     </span>
                   </div>
@@ -169,8 +169,8 @@ const Dataset: React.FC = () => {
           
           <div className="space-y-8">
             {parseResults.map((result) => (
-              <div key={result.id} className={`rounded-lg border ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'} shadow`}>
-                <div className={`p-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+              <div key={result.id} className="workspace-card">
+                <div className="border-b border-app p-4">
                   <div className="flex justify-between items-center">
                     <h3 className="font-semibold">数据项 #{result.id}</h3>
                     <div className="flex items-center gap-4">
@@ -186,13 +186,13 @@ const Dataset: React.FC = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
                   {/* 原始数据 */}
-                  <div className={`p-5 border-r ${isDark ? 'border-gray-700 bg-gray-900/30' : 'border-gray-200 bg-gray-50'}`}>
+                  <div className="border-r border-app bg-app-muted p-5">
                     <h4 className="font-medium mb-3 flex items-center">
                       <span className={`w-3 h-3 rounded-full mr-2 ${isDark ? 'bg-red-500' : 'bg-red-400'}`}></span>
                       原始数据
                     </h4>
-                    <div className={`p-4 rounded ${isDark ? 'bg-gray-900/50' : 'bg-gray-100'}`}>
-                      <p className={`whitespace-pre-line text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <div className="rounded-2xl bg-app-panel p-4">
+                      <p className="whitespace-pre-line text-sm text-app-soft">
                         {result.original}
                       </p>
                     </div>
@@ -201,11 +201,11 @@ const Dataset: React.FC = () => {
                   {/* 解析结果 */}
                   <div className="p-5">
                     <h4 className="font-medium mb-3 flex items-center">
-                      <span className={`w-3 h-3 rounded-full mr-2 ${isDark ? 'bg-blue-500' : 'bg-blue-400'}`}></span>
+                      <span className="mr-2 h-3 w-3 rounded-full bg-app-accent"></span>
                       解析结果
                     </h4>
-                    <div className={`p-4 rounded ${isDark ? 'bg-blue-900/20 border border-blue-800/50' : 'bg-blue-50 border border-blue-200'}`}>
-                      <p className={`whitespace-pre-line text-sm font-medium ${isDark ? 'text-blue-300' : 'text-blue-800'}`}>
+                    <div className="rounded-2xl border border-[var(--accent-border)] bg-[var(--accent-soft)] p-4">
+                      <p className="whitespace-pre-line text-sm font-medium text-app-accent">
                         {result.extracted}
                       </p>
                     </div>
@@ -234,7 +234,7 @@ const Dataset: React.FC = () => {
         </div>
 
         {/* 底部说明 */}
-        <div className={`p-6 rounded-lg ${isDark ? 'bg-gray-800' : 'bg-gray-100'}`}>
+        <div className="workspace-toolbar p-6">
           <h3 className="font-semibold mb-3">支持的数据格式</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
@@ -243,7 +243,7 @@ const Dataset: React.FC = () => {
               { name: '图像文件', types: 'JPG, PNG, TIFF, GIF' },
               { name: '文本文件', types: 'TXT, RTF, DOC, DOCX' }
             ].map((format, index) => (
-              <div key={index} className={`p-4 rounded ${isDark ? 'bg-gray-700' : 'bg-white'} shadow-sm`}>
+              <div key={index} className="workspace-card-subtle p-4">
                 <div className="font-medium">{format.name}</div>
                 <div className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                   {format.types}

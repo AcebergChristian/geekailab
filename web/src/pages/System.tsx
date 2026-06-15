@@ -1,37 +1,13 @@
-import React, { useState } from 'react';
-import { 
-  ChevronDown, Search, Filter, Download, Settings, 
-  MoreHorizontal, RefreshCw, User, Bell, Menu, Grid, PieChart,
-  FileText, BarChart2, LayoutDashboard, Moon, Sun, Home, Users, Database, BarChart3,
-  ArrowLeftSquareIcon
+import React from 'react';
+import {
+  Grid, PieChart, FileText, BarChart2, LayoutDashboard, Moon, Sun, Database, BarChart3,
+  ArrowLeftSquareIcon, Settings
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useThemeContext } from '@/contexts/themeContext';
 import { useI18nContext } from '@/contexts/i18nContext';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 
-// 侧边栏按钮组件
-interface SidebarButtonProps {
-  icon: React.ReactNode;
-  active?: boolean;
-  onClick?: () => void;
-}
-
-const SidebarButton: React.FC<SidebarButtonProps> = ({ icon, active, onClick }) => {
-  return (
-    <button 
-      className={cn(
-        'flex items-center justify-center w-10 h-10 mb-2 rounded-md transition-colors',
-        active ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-100'
-      )}
-      onClick={onClick}
-    >
-      {icon}
-    </button>
-  );
-};
-
-// 菜单项接口
 interface MenuItem {
   id: string;
   icon: React.ReactNode;
@@ -39,85 +15,75 @@ interface MenuItem {
   path: string;
 }
 
-// 主组件
 const System: React.FC = () => {
-  // 状态管理
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  
-  // 使用上下文
-  const { theme, toggleTheme, isDark } = useThemeContext();
+  const { toggleTheme, isDark } = useThemeContext();
   const { language, toggleLanguage, t } = useI18nContext();
-  
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 菜单项配置
   const menuItems: MenuItem[] = [
-    { id: 'dashboard', icon: <LayoutDashboard size={20} />, label: t('dashboard'), path: '/system/dashboard' },
-    { id: 'workbench', icon: <BarChart3 size={20} />, label: t('workbench'), path: '/system/workbench' },
-    { id: 'saijia', icon: <BarChart2 size={20} />, label: t('evaluation'), path: '/system/saijia' },
-    { id: 'dataset', icon: <Database size={20} />, label: t('dataset'), path: '/system/dataset' },
-    { id: 'experiment', icon: <FileText size={20} />, label: t('experiment'), path: '/system/experiment' },
-    { id: 'chart', icon: <PieChart size={20} />, label: t('chart'), path: '/system/chart' },
-    { id: 'grid', icon: <Grid size={20} />, label: t('grid'), path: '/system/grid' },
+    { id: 'dashboard', icon: <LayoutDashboard size={18} />, label: t('dashboard'), path: '/system/dashboard' },
+    { id: 'workbench', icon: <BarChart3 size={18} />, label: t('workbench'), path: '/system/workbench' },
+    { id: 'saijia', icon: <BarChart2 size={18} />, label: t('evaluation'), path: '/system/saijia' },
+    { id: 'dataset', icon: <Database size={18} />, label: t('dataset'), path: '/system/dataset' },
+    { id: 'experiment', icon: <FileText size={18} />, label: t('experiment'), path: '/system/experiment' },
+    { id: 'chart', icon: <PieChart size={18} />, label: t('chart'), path: '/system/chart' },
+    { id: 'grid', icon: <Grid size={18} />, label: t('grid'), path: '/system/grid' }
   ];
 
-  // 获取当前激活的菜单项
-  const activeTab = menuItems.find(item => location.pathname === item.path)?.id || 'dashboard';
-
-  // 处理菜单点击
-  const handleMenuClick = (path: string) => {
-    navigate(path);
-  };
+  const activeTab = menuItems.find((item) => location.pathname === item.path)?.id || 'dashboard';
 
   return (
-    <div className={cn("flex h-screen", isDark ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900")}>
-      {/* 左侧边栏 */}
-      <aside className={cn("fixed left-0 top-0 h-full w-14 border-r py-4 px-2 hidden md:flex flex-col", 
-        isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200")}>
-        {menuItems.map(item => (
-          <SidebarButton 
-            key={item.id} 
-            icon={item.icon} 
-            active={activeTab === item.id}
-            onClick={() => {
-              handleMenuClick(item.path);
-            }}
-          />
-        ))}
-        
-        <div className="mt-auto">
-          <button 
-            onClick={toggleTheme}
-            className={cn(
-              'flex items-center justify-center w-10 h-10 mb-2 rounded-md transition-colors',
-              isDark ? 'text-yellow-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'
-            )}
-            title={t('themeToggle')}
-          >
-            {isDark ? <Sun size={20} /> : <Moon size={20} />}
+    <div className="workspace-shell flex h-screen overflow-hidden">
+      <aside className="workspace-sidebar hidden h-screen w-[140px] shrink-0 flex-col overflow-hidden px-2 py-4 md:flex">
+        <button onClick={() => navigate('/')} className="mb-6 flex items-center gap-3 px-2 text-left">
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[var(--accent-border)] bg-[var(--accent-soft)] font-semibold text-app-accent">
+            G
+          </div>
+          <div>
+            <div className="text-sm font-semibold text-app">GeekLab</div>
+            <div className="workspace-muted text-xs uppercase tracking-[0.18em]">System</div>
+          </div>
+        </button>
+
+        <div className="mb-3 px-2 workspace-sidebar-title">Workspace</div>
+        <nav className="space-y-1">
+          {menuItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => navigate(item.path)}
+              className={cn('workspace-nav-item w-full', activeTab === item.id && 'workspace-nav-item-active')}
+            >
+              <span className="opacity-90">{item.icon}</span>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div className="mt-auto space-y-1 pt-6">
+          <div className="px-2 workspace-sidebar-title">Preferences</div>
+          <button onClick={toggleTheme} className="workspace-nav-item w-full">
+            {isDark ? <Sun size={18} /> : <Moon size={18} />}
+            <span>{t('themeToggle')}</span>
           </button>
-          <button 
-            onClick={toggleLanguage}
-            className={cn(
-              'flex items-center justify-center w-10 h-10 mb-2 rounded-md transition-colors',
-              isDark ? 'text-blue-400 hover:bg-gray-700' : 'text-gray-600 hover:bg-gray-100'
-            )}
-            title={t('languageToggle')}
-          >
-            {language.toUpperCase()}
+          <button onClick={toggleLanguage} className="workspace-nav-item w-full">
+            <span className="flex h-[18px] w-[18px] items-center justify-center rounded-md border border-app text-[10px] font-semibold">
+              {language.toUpperCase()}
+            </span>
+            <span>{t('languageToggle')}</span>
           </button>
-          <SidebarButton icon={<Settings size={20} />} />
-          <SidebarButton
-            onClick={() => {
-              navigate('/');
-            }}
-            icon={<ArrowLeftSquareIcon size={20} />} />
+          <button className="workspace-nav-item w-full">
+            <Settings size={18} />
+            <span>{t('设置')}</span>
+          </button>
+          <button onClick={() => navigate('/')} className="workspace-nav-item w-full">
+            <ArrowLeftSquareIcon size={18} />
+            <span>{t('返回首页')}</span>
+          </button>
         </div>
       </aside>
 
-      {/* 主内容区 */}
-      <main className="flex-1 md:ml-14 p-6 overflow-y-auto">
+      <main className="workspace-main h-screen flex-1 overflow-y-auto">
         <Outlet />
       </main>
     </div>

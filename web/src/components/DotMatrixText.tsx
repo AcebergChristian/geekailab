@@ -138,10 +138,10 @@ const DotMatrixText: React.FC = () => {
     setDots(fullMatrix);
   }, []);
 
-  const dotColor = isDark ? 'bg-purple-500' : 'bg-emerald-500';
+  const dotColor = 'bg-app-accent';
   const glowColor = isDark 
-    ? 'shadow-[0_0_8px_rgba(168,85,247,0.6)]' 
-    : 'shadow-[0_0_8px_rgba(16,185,129,0.6)]';
+    ? 'shadow-[0_0_8px_rgba(214,117,86,0.68)]' 
+    : 'shadow-[0_0_8px_rgba(214,117,86,0.52)]';
 
   // 每个点由3x4的小点组成
   const renderMultiDot = (isActive: boolean, baseDelay: number) => {

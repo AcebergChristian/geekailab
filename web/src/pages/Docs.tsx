@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { useThemeContext } from '@/contexts/themeContext';
 import { useI18nContext } from '@/contexts/i18nContext';
 
 
@@ -278,7 +276,6 @@ const docSections: DocSection[] = [
 
 
 export default function Docs() {
-  const { isDark } = useThemeContext();
   const { t } = useI18nContext();
 
   const [activeSection, setActiveSection] = useState('');
@@ -357,177 +354,118 @@ const docOutline = docSections.map(section => ({
 }));
 
   return (
-    <div className={`
-      min-h-screen
-      ${isDark
-        ? 'bg-gray-900 text-gray-100'
-        : 'bg-white text-gray-900'}
-      font-sans antialiased
-    `}>
-
-
-      <div className="pt-40 container mx-auto px-6 py-12">
-        <div className="flex">
-          {/* 左侧浮动导航栏 */}
-          <div
-            className={`
-              fixed left-6 top-24 bottom-24 w-64 overflow-y-auto z-40
-              ${isDark
-                ? 'bg-gray-800/80 backdrop-blur-md shadow-lg rounded-xl p-4 border border-gray-700'
-                : 'bg-white/80 backdrop-blur-md shadow-lg rounded-xl p-4 border border-gray-200'}
-            `}
-          >
-            <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-emerald-400' : 'text-emerald-700'}`}>文档目录</h3>
-            <ul className="space-y-2">
-              {docOutline.map(section => (
-                <li key={section.id}>
-                  <button
-                    onClick={() => scrollToSection(section.id)}
-                    className={`
-                      w-full text-left py-2 px-3 rounded-lg transition-colors
-                      ${activeSection === section.id
-                        ? (isDark ? 'bg-emerald-900/50 text-emerald-300' : 'bg-emerald-100 text-emerald-800')
-                        : (isDark ? 'hover:bg-gray-800/50 text-gray-300' : 'hover:bg-gray-100 text-gray-700')}
-                    `}
-                  >
-                    <span className={`
-                      ${section.level === 1 ? 'font-bold' : 'font-normal ml-2'}
-                      ${section.level === 1 ? 'text-base' : 'text-sm'}
-                    `}>
-                      {section.title}
-                    </span>
-                  </button>
-                  {section.children && (
-                    <ul className="ml-4 mt-1 space-y-1">
-                      {section.children.map(child => (
+    <div className="px-4 pb-20 pt-10 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
+          <aside className="lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)] lg:overflow-y-auto">
+            <div className="app-doc-sidebar rounded-[28px] p-5">
+              <div className="app-accent-chip mb-4">Docs</div>
+              <h3 className="text-xl font-semibold text-app">文档目录</h3>
+              <p className="mt-2 text-sm leading-6 text-app-soft">
+                参考 Cursor 文档的清爽感和 Claude Docs 的暗色层级，保留现有文档信息架构。
+              </p>
+              <ul className="mt-6 space-y-2">
+                {docOutline.map((section) => (
+                  <li key={section.id}>
+                    <button
+                      onClick={() => scrollToSection(section.id)}
+                      className={`app-doc-link ${activeSection === section.id ? 'app-doc-link-active' : ''}`}
+                    >
+                      <span className="font-semibold">{section.title}</span>
+                    </button>
+                    <ul className="mt-2 space-y-1 pl-3">
+                      {section.children.map((child) => (
                         <li key={child.id}>
                           <button
                             onClick={() => scrollToSection(child.id)}
-                            className={`
-                              w-full text-left py-1.5 px-3 rounded-lg transition-colors
-                              ${activeSection === child.id
-                                ? (isDark ? 'bg-emerald-900/30 text-emerald-200' : 'bg-emerald-100 text-emerald-700')
-                                : (isDark ? 'hover:bg-gray-800/30 text-gray-400' : 'hover:bg-gray-100 text-gray-600')}
-                              text-xs
-                            `}
+                            className={`app-doc-link text-[13px] ${activeSection === child.id ? 'app-doc-link-active' : ''}`}
                           >
                             {child.title}
                           </button>
                         </li>
                       ))}
                     </ul>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* 右侧内容区域 */}
-          <div className="ml-72 flex-1 max-w-4xl">
-            <div className="mb-16 text-center">
-              <h1 className={`text-4xl md:text-5xl font-bold mb-6 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                开发者文档
-              </h1>
-              <p className={`text-xl max-w-3xl mx-auto ${isDark ? 'text-gray-400' : 'text-gray-700'}`}>
-                详细了解我们的非结构化数据解析和识别提取平台
-              </p>
-            </div>
-            {docSections.map(section => (
-              <section
-                key={section.id}
-                data-section
-                id={section.id}
-                className="mb-16"
-              >
-                <h2 className={`text-3xl font-bold mb-6 ${isDark ? 'text-emerald-400' : 'text-emerald-500'}`}>
-                  {section.title}
-                </h2>
-
-                {section.children.map(child => (
-                  <div
-                    key={child.id}
-                    data-section
-                    id={child.id}
-                    className="mb-10"
-                  >
-                    <h3 className={`text-2xl font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                      {child.title}
-                    </h3>
-
-                    {child.blocks.map((block, idx) => {
-                      if (block.type === 'paragraph') {
-                        return (
-                          <p
-                            key={idx}
-                            className={`mb-4 leading-relaxed ${isDark ? 'text-gray-300' : 'text-gray-700'
-                              }`}
-                          >
-                            {block.text}
-                          </p>
-                        );
-                      }
-
-                      if (block.type === 'list') {
-                        return (
-                          <ul
-                            key={idx}
-                            className={`space-y-2 ${isDark ? 'text-gray-300' : 'text-gray-700'
-                              }`}
-                          >
-                            {block.items.map((item, i) => (
-                              <li key={i} className="flex items-start">
-                                <span className="text-emerald-500 mr-2">•</span>
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        );
-                      }
-
-                      if (block.type === 'code') {
-                        return (
-                          <div key={idx} className="mb-4">
-                            <pre
-                              className={`
-                      p-4 rounded-lg overflow-x-auto
-                      ${isDark
-                                  ? 'bg-gray-900 text-emerald-400 border border-emerald-500/30'
-                                  : 'bg-gray-100 text-emerald-700 border border-emerald-200'
-                                }
-                    `}
-                            >
-                              <code>{block.content}</code>
-                            </pre>
-                            {block.note && (
-                              <p className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                                {block.note}
-                              </p>
-                            )}
-                          </div>
-                        );
-                      }
-
-                      return null;
-                    })}
-                  </div>
+                  </li>
                 ))}
-              </section>
-            ))}
+              </ul>
+            </div>
+          </aside>
 
+          <div className="min-w-0">
+            <section className="app-card px-7 py-10 sm:px-10 sm:py-12">
+              <div>
+                <div className="app-accent-chip mb-5">{t('开始使用')}</div>
+                <h1 className="text-4xl font-semibold tracking-tight text-app md:text-6xl">开发者文档</h1>
+                <p className="mt-5 max-w-3xl text-lg leading-8 text-app-soft">
+                  详细了解我们的非结构化数据解析和识别提取平台，让亮暗两套主题都具备更稳定的阅读对比和导航层级。
+                </p>
+              </div>
+            </section>
 
+            <div className="mt-8 space-y-8">
+              {docSections.map((section) => (
+                <section key={section.id} data-section id={section.id} className="scroll-mt-28">
+                  <div className="app-card px-7 py-8 sm:px-9">
+                    <div className="mb-8 flex items-center gap-4">
+                      <div className="h-px flex-1 bg-[var(--border)]" />
+                      <h2 className="text-2xl font-semibold text-app md:text-3xl">{section.title}</h2>
+                    </div>
 
+                    <div className="space-y-8">
+                      {section.children.map((child) => (
+                        <article key={child.id} id={child.id} data-section className="scroll-mt-28">
+                          <div className="mb-4 flex items-center gap-3">
+                            <div className="h-2.5 w-2.5 rounded-full bg-app-accent" />
+                            <h3 className="text-xl font-semibold text-app md:text-2xl">{child.title}</h3>
+                          </div>
 
+                          <div className="space-y-4">
+                            {child.blocks.map((block, idx) => {
+                              if (block.type === 'paragraph') {
+                                return (
+                                  <p key={idx} className="text-base leading-8 text-app-soft">
+                                    {block.text}
+                                  </p>
+                                );
+                              }
 
+                              if (block.type === 'list') {
+                                return (
+                                  <ul key={idx} className="space-y-3 text-base leading-8 text-app-soft">
+                                    {block.items.map((item, i) => (
+                                      <li key={i} className="flex items-start gap-3">
+                                        <span className="mt-3 h-1.5 w-1.5 rounded-full bg-app-accent" />
+                                        <span>{item}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                );
+                              }
+
+                              if (block.type === 'code') {
+                                return (
+                                  <div key={idx}>
+                                    <pre className="app-code-block">
+                                      <code>{block.content}</code>
+                                    </pre>
+                                    {block.note && <p className="mt-2 text-sm text-app-faint">{block.note}</p>}
+                                  </div>
+                                );
+                              }
+
+                              return null;
+                            })}
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  </div>
+                </section>
+              ))}
+            </div>
           </div>
-
-
-
-
         </div>
       </div>
-
-
-
     </div>
   );
 }

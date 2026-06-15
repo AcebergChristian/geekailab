@@ -40,7 +40,7 @@ const translations: Translations = {
     geekmindSystem: 'GeekMind Sys',
     enterGeekmindSystem: 'Enter GeekMind Sys',
     themeToggle: 'Toggle Theme',
-    languageToggle: 'Toggle Language',
+    languageToggle: 'Language',
     GeekmindSystem: 'GeekMind Sys',
     showEmailList: 'Show Email List',
     // 新增AI平台相关词条
@@ -242,7 +242,7 @@ const translations: Translations = {
     pricing: '价格',
     geekmindPlatform: 'GEEK AI 实验室',
     platformDescription: '综合性AI能力平台，包含大模型、智能体及行业解决方案',
-    tryNow: '立即登录使用',
+    tryNow: '登录',
     learnMore: '了解更多',
     coreCapabilities: '核心能力',
     aiSolutions: 'AI解决方案',
