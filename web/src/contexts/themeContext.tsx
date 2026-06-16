@@ -2,15 +2,18 @@ import { createContext, useContext } from 'react';
 import { useTheme as useThemeHook } from '@/hooks/useTheme';
 
 type Theme = 'light' | 'dark';
+type ThemeMode = Theme | 'system';
 
 interface ThemeContextType {
   theme: Theme;
+  mode: ThemeMode;
   toggleTheme: () => void;
   isDark: boolean;
 }
 
 export const ThemeContext = createContext<ThemeContextType>({
   theme: 'light',
+  mode: 'system',
   toggleTheme: () => {},
   isDark: false
 });
@@ -20,10 +23,10 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
-  const { theme, toggleTheme, isDark } = useThemeHook();
+  const { theme, mode, toggleTheme, isDark } = useThemeHook();
   
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, isDark }}>
+    <ThemeContext.Provider value={{ theme, mode, toggleTheme, isDark }}>
       {children}
     </ThemeContext.Provider>
   );
